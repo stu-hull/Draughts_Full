@@ -7,6 +7,18 @@ package com.example.stuart.draughts;
  */
 public class Board {
 
+    //test method
+    public static void main(String[] args){
+        Board testBoard = new Board();
+        testBoard.blackPieces = 0b0000011010011101010000011000001000000000000000L;
+        testBoard.whitePieces = 0b0000000000000000000011000100010011100111100000L;
+        testBoard.kings =       0b0000000000001000010001000100000000000011100000L;
+
+        System.out.println(Long.toBinaryString(testBoard.blackMen()));
+        System.out.println(Long.toBinaryString(testBoard.whiteMen()));
+        System.out.println(Long.toBinaryString(testBoard.blackKings()));
+    }
+
     /*
     board layout:
       37  38  39  40
@@ -28,11 +40,11 @@ public class Board {
     //takes an integer board position, and creates a mask for that position
     public static long findMask(int position){
         long result = 1;
-        for (int i=0; i<(45-position); i++){
+        for (int i=0; i<(45-position); i++){ //raises 2 to the power of (45-position), no easier way to do this in java (Math.pow is an approximation)
             result *= 2;
         }
         return result;
-    } //DONE
+    } //DONE //TESTED
 
     //trims the excess off of an array of Boards
     public static Board[] trim(Board[] array){
@@ -43,7 +55,7 @@ public class Board {
         Board[] newArray = new Board[length];
         System.arraycopy(array, 0, newArray, 0, length);
         return newArray;
-    }  //...DONE //FULLY TESTED
+    }  //...DONE //TESTED
 
     //the 3 base bitboards used to permanently represent the board (cannot be freely edited)
     private long blackPieces; //stores the location of all black pieces
@@ -71,12 +83,6 @@ public class Board {
         whitePieces = 0b0000000000000000000000000000000000000000000000L;
         kings =       0b0000000000000000000000000000000000000000000000L;
     } //sets up a board with no pieces on, the players return this as their best move if they cannot play
-    public boolean isNull(){
-        if (blackPieces + whitePieces + kings == 0){
-            return true;
-        }
-        return false;
-    } //checks is the board is null
     public void copyBoard(Board original){
         blackPieces = original.getBlackPieces();
         whitePieces = original.getWhitePieces();

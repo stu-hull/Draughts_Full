@@ -9,6 +9,7 @@ package com.example.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -34,6 +35,7 @@ public class Game extends AppCompatActivity {
     boolean inPlay; //is the game playing? (has a winner been found?)
     boolean player1win; //has player 1 won?
 
+    //default constructor, againstCOmputer and player1Black both true
     public Game(){
         //is the game against the computer? Which player is black?
         this.againstComputer = true;
@@ -105,4 +107,8 @@ public class Game extends AppCompatActivity {
 
     }
 
+    public void startGame(View view) {
+        Intent intent = new Intent(this, Game.class);
+        startActivity(intent);
+    }
 }

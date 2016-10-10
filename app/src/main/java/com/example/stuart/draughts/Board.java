@@ -7,6 +7,24 @@ package com.example.stuart.draughts;
  */
 public class Board {
 
+    //test method
+    public static void main(String[] args){
+        Board testBoard = new Board();
+        testBoard.blackPieces = 0b0000001000000000000000000000000000000000000000L;
+        testBoard.whitePieces = 0b0000000000010000000000000000000000000000000000L;
+        testBoard.kings =       0b0000001000010000000000000000000000000000000000L;
+
+        System.out.println(Long.toBinaryString(testBoard.blackPieces));
+        System.out.println(Long.toBinaryString(testBoard.whitePieces));
+        System.out.println(Long.toBinaryString(testBoard.kings));
+
+        Board newBoard = testBoard.makeSimpleMove(6, 16);
+
+        System.out.println(Long.toBinaryString(newBoard.blackPieces));
+        System.out.println(Long.toBinaryString(newBoard.whitePieces));
+        System.out.println(Long.toBinaryString(newBoard.kings));
+    }
+
     /*
     board layout:
       37  38  39  40
@@ -28,11 +46,11 @@ public class Board {
     //takes an integer board position, and creates a mask for that position
     public static long findMask(int position){
         long result = 1;
-        for (int i=0; i<(45-position); i++){
+        for (int i=0; i<(45-position); i++){ //raises 2 to the power of (45-position), no easier way to do this in java (Math.pow is an approximation)
             result *= 2;
         }
         return result;
-    } //DONE
+    } //DONE //TESTED
 
     //trims the excess off of an array of Boards
     public static Board[] trim(Board[] array){
@@ -43,7 +61,7 @@ public class Board {
         Board[] newArray = new Board[length];
         System.arraycopy(array, 0, newArray, 0, length);
         return newArray;
-    }  //...DONE //FULLY TESTED
+    }  //...DONE //TESTED
 
     //the 3 base bitboards used to permanently represent the board (cannot be freely edited)
     private long blackPieces; //stores the location of all black pieces
@@ -71,12 +89,6 @@ public class Board {
         whitePieces = 0b0000000000000000000000000000000000000000000000L;
         kings =       0b0000000000000000000000000000000000000000000000L;
     } //sets up a board with no pieces on, the players return this as their best move if they cannot play
-    public boolean isNull(){
-        if (blackPieces + whitePieces + kings == 0){
-            return true;
-        }
-        return false;
-    } //checks is the board is null
     public void copyBoard(Board original){
         blackPieces = original.getBlackPieces();
         whitePieces = original.getWhitePieces();
@@ -100,7 +112,7 @@ public class Board {
         return blackPieces | whitePieces;
     } //all pieces, black and white
     public long emptySquares() {
-        return ~blackPieces & ~whitePieces & maskValid;
+        return ~allPieces() & maskValid;
     } //empty squares (valid squares not black nor white)
 
     //methods to query the board
@@ -110,6 +122,9 @@ public class Board {
     public boolean isWhite(int position){
         return ((findMask(position) & whitePieces) != 0);
     } //returns true if a given position has a white piece
+    public boolean isKing(int position){
+        return ((findMask(position) & kings) != 0);
+    }  //returns true if a given position has a king
     public int blackCount(long mask){
         return Long.bitCount(blackPieces & mask);
     } //returns the number of black pieces under a given mask
@@ -134,6 +149,9 @@ public class Board {
             } else {
                 afterMove.blackPieces -= findMask(captured);
             }
+            if (isKing(captured)){ //if captured piece is king, king bit must be removed
+                afterMove.kings -= findMask(captured);
+            }
         }
 
         //remove piece from source and replace at destination
@@ -143,6 +161,10 @@ public class Board {
         } else {
             afterMove.whitePieces -= findMask(source);
             afterMove.whitePieces += findMask(destination);
+        }
+        if (isKing(source)){ //if king, king bit indicator must move too
+            afterMove.kings -= findMask(source);
+            afterMove.kings += findMask(destination);
         }
 
         return afterMove;

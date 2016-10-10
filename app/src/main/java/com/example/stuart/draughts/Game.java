@@ -110,5 +110,8 @@ public class Game extends AppCompatActivity {
     public void startGame(View view) {
         Intent intent = new Intent(this, Game.class);
         startActivity(intent);
+        //Game game = new Game();
+        //game.runGame();
+        System.out.println("Hello World");
     }
 }

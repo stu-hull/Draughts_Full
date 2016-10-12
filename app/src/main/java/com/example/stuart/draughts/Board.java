@@ -10,19 +10,16 @@ public class Board {
     //test method
     public static void main(String[] args){
         Board testBoard = new Board();
-        testBoard.blackPieces = 0b0000001000000000000000000000000000000000000000L;
-        testBoard.whitePieces = 0b0000000000010000000000000000000000000000000000L;
-        testBoard.kings =       0b0000001000010000000000000000000000000000000000L;
-
-        System.out.println(Long.toBinaryString(testBoard.blackPieces));
-        System.out.println(Long.toBinaryString(testBoard.whitePieces));
-        System.out.println(Long.toBinaryString(testBoard.kings));
-
-        Board newBoard = testBoard.makeSimpleMove(6, 16);
-
-        System.out.println(Long.toBinaryString(newBoard.blackPieces));
-        System.out.println(Long.toBinaryString(newBoard.whitePieces));
-        System.out.println(Long.toBinaryString(newBoard.kings));
+        testBoard.blackPieces = 0b0000011110000000100000000000000000000000000000L;
+        testBoard.whitePieces = 0b0000000000000000000111000000000000000000000000L;
+        testBoard.kings =       0b0000011110000000100000000000000000000000000000L;
+        Board[] jumps = testBoard.findMultiJump(16);
+        for (Board move : jumps){
+            System.out.println(Long.toBinaryString(move.blackPieces));
+            System.out.println(Long.toBinaryString(move.whitePieces));
+            System.out.println(Long.toBinaryString(move.kings));
+            System.out.println("");
+        }
     }
 
     /*
@@ -168,7 +165,7 @@ public class Board {
         }
 
         return afterMove;
-    }  //...DONE
+    }  //...DONE //TESTED
 
     //finds all legal moves for a given player.
     public Board[] findMoves(boolean isBlack){
@@ -248,16 +245,20 @@ public class Board {
 
             for (int position = 5; position <= 40; position++){ //for each board position
                 if ((moversLF & Board.findMask(position)) != 0){ //if it can move LF
-                    totalMoves[totalMoveCount] = this.makeSimpleMove(position, position+8); //add move to total
+                    totalMoves[totalMoveCount] = this.makeSimpleMove(position, position+4); //add move to total
+                    totalMoveCount += 1; //move counter increases
                 }
                 if ((moversRF & Board.findMask(position)) != 0){ //if it can move RF
-                    totalMoves[totalMoveCount] = this.makeSimpleMove(position, position+10); //add move to total
+                    totalMoves[totalMoveCount] = this.makeSimpleMove(position, position+5); //add move to total
+                    totalMoveCount += 1; //move counter increases
                 }
                 if ((moversLB & Board.findMask(position)) != 0){ //if it can move LB
-                    totalMoves[totalMoveCount] = this.makeSimpleMove(position, position-10); //add move to total
+                    totalMoves[totalMoveCount] = this.makeSimpleMove(position, position-5); //add move to total
+                    totalMoveCount += 1; //move counter increases
                 }
                 if ((moversRB & Board.findMask(position)) != 0){ //if it can move RB
-                    totalMoves[totalMoveCount] = this.makeSimpleMove(position, position-8); //add move to total
+                    totalMoves[totalMoveCount] = this.makeSimpleMove(position, position-4); //add move to total
+                    totalMoveCount += 1; //move counter increases
                 }
             }
 
@@ -265,7 +266,7 @@ public class Board {
             return totalMoves;
         }
 
-    } //...DONE
+    } //...DONE //TESTED
 
     //looks at a single piece which has just jumped, and returns all possible multi jumps it can do afterwards as well as the single jump
     private Board[] findMultiJump(int position){
@@ -333,6 +334,6 @@ public class Board {
 
         totalMoves = trim(totalMoves);
         return totalMoves;
-    } //...DONE
+    } //...DONE //TESTED
 
 }

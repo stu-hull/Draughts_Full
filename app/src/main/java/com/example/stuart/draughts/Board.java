@@ -10,17 +10,29 @@ public class Board {
     //test method
     public static void main(String[] args){
         Board testBoard = new Board();
-        testBoard.blackPieces = 0b0000011110000000100000000000000000000000000000L;
-        testBoard.whitePieces = 0b0000000000000000000111000000000000000000000000L;
-        testBoard.kings =       0b0000011110000000100000000000000000000000000000L;
-        Board[] jumps = testBoard.findMultiJump(16);
-        for (Board move : jumps){
-            System.out.println(Long.toBinaryString(move.blackPieces));
-            System.out.println(Long.toBinaryString(move.whitePieces));
-            System.out.println(Long.toBinaryString(move.kings));
+        //testBoard.blackPieces = 0b0000011110000000100000000000000000000000000000L;
+        //testBoard.whitePieces = 0b0000000000000000000111000000000000000000000000L;
+        //testBoard.kings =       0b0000011110000000100000000000000000000000000000L;
+        testBoard.realBoard();
+        System.out.println(Long.toBinaryString(testBoard.blackPieces));
+        System.out.println(Long.toBinaryString(testBoard.whitePieces));
+        System.out.println(Long.toBinaryString(testBoard.kings));
+
+        Board[] allMoves = testBoard.findMoves(true);
+        for (Board move : allMoves){
             System.out.println("");
+            System.out.println(Long.toBinaryString(move.getBlackPieces()));
+            System.out.println(Long.toBinaryString(move.getWhitePieces()));
+            System.out.println(Long.toBinaryString(move.getKings()));
         }
+
     }
+
+    public void realBoard(){
+        blackPieces = 0b0000010110000000010011000000000000000000000000L;
+        whitePieces = 0b0000001000000010000100010000001001110001100000L;
+        kings       = 0b0000001000000000000000000000000000000000000000L;
+    } //sets up a realistic board scenario for testing
 
     /*
     board layout:
@@ -198,23 +210,27 @@ public class Board {
             for (int position = 5; position <= 40; position++) { //go through all board positions
                 if ((jumpersLF & findMask(position)) != 0) { //if it can jump LF
                     Board afterJump = this.makeSimpleMove(position, position+8); //make the jump
-                    furtherMoves = afterJump.findMultiJump(position); //check for all further moves from that position
+                    furtherMoves = afterJump.findMultiJump(position+8); //check for all further moves from that position
                     System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
+                    totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                 }
                 if ((jumpersRF & findMask(position)) != 0) { //if it can jump RF
                     Board afterJump = this.makeSimpleMove(position, position+10); //make the jump
-                    furtherMoves = afterJump.findMultiJump(position); //check for all further moves from that position
+                    furtherMoves = afterJump.findMultiJump(position+10); //check for all further moves from that position
                     System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
+                    totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                 }
                 if ((jumpersLB & Board.findMask(position)) != 0) { //if it can jump LB
                     Board afterJump = this.makeSimpleMove(position, position-10); //make the jump
-                    furtherMoves = afterJump.findMultiJump(position); //check for all further moves from that position
+                    furtherMoves = afterJump.findMultiJump(position-10); //check for all further moves from that position
                     System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
+                    totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                 }
                 if ((jumpersRB & Board.findMask(position)) != 0) { //if it can jump RB
                     Board afterJump = this.makeSimpleMove(position, position-8); //make the jump
-                    furtherMoves = afterJump.findMultiJump(position); //check for all further moves from that position
+                    furtherMoves = afterJump.findMultiJump(position-8); //check for all further moves from that position
                     System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
+                    totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                 }
             }
 

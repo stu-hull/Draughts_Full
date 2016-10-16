@@ -6,6 +6,37 @@ package com.example.stuart.draughts;
  */
 public class Player {
 
+    //test method
+    public static void main(String[] args){
+
+        Player steve = new Player(true, true);
+        Board testBoard = new Board();
+
+        testBoard.realBoard();
+        System.out.println(Long.toBinaryString(testBoard.getBlackPieces()));
+        System.out.println(Long.toBinaryString(testBoard.getWhitePieces()));
+        System.out.println(Long.toBinaryString(testBoard.getKings()));
+
+        double heuristic = steve.heuristicV1(testBoard);
+        System.out.println(heuristic);
+
+        Board[] allMoves = testBoard.findMoves(true);
+        for (Board move : allMoves){
+            System.out.println("");
+            System.out.println(Long.toBinaryString(move.getBlackPieces()));
+            System.out.println(Long.toBinaryString(move.getWhitePieces()));
+            System.out.println(Long.toBinaryString(move.getKings()));
+        }
+
+        Board bestMove = steve.minimax(testBoard, true, 8);
+        System.out.println("");
+        System.out.println("Move chosen:");
+        System.out.println(Long.toBinaryString(bestMove.getBlackPieces()));
+        System.out.println(Long.toBinaryString(bestMove.getWhitePieces()));
+        System.out.println(Long.toBinaryString(bestMove.getKings()));
+
+    }
+
     //details about the player
     private boolean isBlack;
     private boolean isHuman;
@@ -45,16 +76,17 @@ public class Player {
 
         for (Board currentMove : availableMoves) { //for each move in the list of possible moves
             currentScore = minimaxV1(currentMove, isBlack, depth-1); //score of current move is found with minimax
-            if (currentScore > bestScore){ //if current move is better than all before it
+            if ((isBlack && currentScore > bestScore) || (!isBlack && currentScore < bestScore)){ //if current move is better than all before it (or worse if you're white)
                 bestScore = currentScore; //set best score to score of current move
                 bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)
             }
         }
 
         return bestMove;
-    }
+    } //DONE //TESTED
 
     //Version 1 of the minimax algorithm, this version will likely be replaced for greater efficiency and/or accuracy
+    //Testing indicates this algorithm reach 8 plies in around 5 seconds of desktop processing time
     //Special features: none (no ab pruning, no quiscience search, no hash table, nothing)
     private double minimaxV1(Board board, boolean isBlack, int depth){
 
@@ -82,9 +114,9 @@ public class Player {
             }
         }
 
-        return bestScore;
+        return bestScore; //return best score out available moves
 
-    }
+    } //DONE //TESTED
 
     //Version 1 of the heuristic algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Ideas: incentives to keep back row intact, control central 8 squares, and get kings; value a piece difference greater with fewer pieces on board; blocking option?
@@ -117,6 +149,6 @@ public class Player {
 
         return score;
 
-    }
+    } //DONE //TESTED
 
 }

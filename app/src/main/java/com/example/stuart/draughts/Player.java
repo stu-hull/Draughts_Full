@@ -45,7 +45,7 @@ public class Player {
     public Player(boolean isBlack, boolean isHuman){
         this.isBlack = isBlack;
         this.isHuman = isHuman;
-    }
+    } //DONE //TESTED
 
     //This method is run when the game requires the player to make a move
     public Board makeMove(Board currentBoard){
@@ -54,7 +54,7 @@ public class Player {
         if (isHuman){ //if human, update the graphics to request a move from the user
             return currentBoard;
         } else { //if AI, return the result of the minimax algorithm
-            return minimax(currentBoard, isBlack, 5);
+            return minimax(currentBoard, isBlack, 8);
         }
     }
 

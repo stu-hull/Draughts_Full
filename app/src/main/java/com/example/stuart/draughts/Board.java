@@ -10,9 +10,6 @@ public class Board {
     //test method
     public static void main(String[] args){
         Board testBoard = new Board();
-        //testBoard.blackPieces = 0b0000011110000000100000000000000000000000000000L;
-        //testBoard.whitePieces = 0b0000000000000000000111000000000000000000000000L;
-        //testBoard.kings =       0b0000011110000000100000000000000000000000000000L;
         testBoard.realBoard();
         System.out.println(Long.toBinaryString(testBoard.blackPieces));
         System.out.println(Long.toBinaryString(testBoard.whitePieces));

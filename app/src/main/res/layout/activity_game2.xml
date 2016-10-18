@@ -10,7 +10,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/player2"
         android:id="@+id/player1Tag"
-        android:layout_above="@+id/imageView"
+        android:layout_above="@+id/gameboard"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -19,13 +19,13 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/player1"
         android:id="@+id/player2Tag"
-        android:layout_below="@+id/imageView"
+        android:layout_below="@+id/gameboard"
         android:layout_centerHorizontal="true" />
 
     <ImageView
         android:layout_width="@dimen/board_size"
         android:layout_height="@dimen/board_size"
-        android:id="@+id/imageView"
+        android:id="@+id/gameboard"
         android:src="@drawable/boardv2"
         android:contentDescription="@string/gameboard_desc"
         android:layout_centerVertical="true"
@@ -35,14 +35,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/redman"
-        android:id="@+id/imageView2"
+        android:id="@+id/blackCounter1"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         android:maxWidth="30dp"
         android:layout_marginBottom="11dp"
-        android:layout_alignBottom="@+id/imageView"
-        android:layout_alignLeft="@+id/imageView"
-        android:layout_alignStart="@+id/imageView"
+        android:layout_alignBottom="@+id/gameboard"
+        android:layout_alignLeft="@+id/gameboard"
+        android:layout_alignStart="@+id/gameboard"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp" />
 

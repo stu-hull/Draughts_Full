@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/redman"
-        android:id="@+id/blackCounter1"
+        android:id="@+id/blackCounter0"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         android:maxWidth="30dp"

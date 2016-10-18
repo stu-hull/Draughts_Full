@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 
 public class Game extends AppCompatActivity {
 
@@ -110,8 +111,19 @@ public class Game extends AppCompatActivity {
     public void startGame(View view) {
         Intent intent = new Intent(this, Game.class);
         startActivity(intent);
+        ImageView[] counters = findCounters();
         //Game game = new Game();
         //game.runGame();
         System.out.println("Hello World");
     }
+
+    //function finds each of the counters on the board as an array, using findViewById
+    private ImageView[] findCounters(){
+        ImageView[] list = new ImageView[24];
+        list[0] = (ImageView) findViewById(R.id.blackCounter0);
+
+        return list;
+    }
+
+
 }

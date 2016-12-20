@@ -112,9 +112,10 @@ public class Game extends AppCompatActivity {
         Intent intent = new Intent(this, Game.class);
         startActivity(intent);
         ImageView[] counters = findCounters();
-        //Game game = new Game();
-        //game.runGame();
-        System.out.println("Hello World");
+        counters[0].setX(200);
+        counters[0].setY(200);
+        Game game = new Game();
+        game.runGame();
     }
 
     //function finds each of the counters on the board as an array, using findViewById

@@ -3,4 +3,5 @@
     <item name="gameBoard" type="id"/>
     <item name="player1Label" type="id"/>
     <item name="player2Label" type="id"/>
+    <item name="counter0" type="id"/>
 </resources>

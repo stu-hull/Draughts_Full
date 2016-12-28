@@ -21,7 +21,6 @@ public class MainMenu extends AppCompatActivity {
 
     //Runs when "Start Game" button on home screen is pressed- starts game activity
     public void startGame(View view) {
-        System.out.println("Debug point 1");
         startActivity(new Intent(MainMenu.this, GameActivity.class));
     }
 

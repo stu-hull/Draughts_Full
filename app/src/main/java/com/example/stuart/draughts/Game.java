@@ -9,18 +9,22 @@ package com.example.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 public class Game extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game2);
+        setContentView(R.layout.activity_game);
+    }
+
+    public static void main(String[] args){
+
     }
 
     Player player1;
@@ -109,22 +113,7 @@ public class Game extends AppCompatActivity {
     }
 
     public void startGame(View view) {
-        Intent intent = new Intent(this, Game.class);
-        startActivity(intent);
-        ImageView[] counters = findCounters();
-        counters[0].setX(200);
-        counters[0].setY(200);
-        Game game = new Game();
-        game.runGame();
+
     }
-
-    //function finds each of the counters on the board as an array, using findViewById
-    private ImageView[] findCounters(){
-        ImageView[] list = new ImageView[24];
-        list[0] = (ImageView) findViewById(R.id.blackCounter0);
-
-        return list;
-    }
-
 
 }

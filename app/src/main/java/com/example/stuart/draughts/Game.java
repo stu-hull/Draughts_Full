@@ -24,74 +24,68 @@ public class Game extends AppCompatActivity {
         setContentView(R.layout.activity_game);
     }
 
-    public Player player1;
-    public Player player2;
+    private Player player1;
+    private Player player2;
 
     public Board currentBoard; //current board being displayed
-    public Board newBoard; //board after move requested by player
+    private Board newBoard; //board after move requested by player
+    private ImageView[] counterViews; //counter views, for adding into the GameActivity's RelativeLayout
 
     //boolean variables for details of the game
-    public boolean againstComputer; //is it against AI or 2 player
-    public boolean player1Black; //is player 1 black
-    public boolean player1Turn; //is it player 1's turn
+    private boolean againstComputer; //is it against AI or 2 player
+    private boolean player1Black; //is player 1 black
+    private boolean player1Turn; //is it player 1's turn
+
+    //getters for all of those
+    public Player getPlayer1() {
+        return player1;
+    }
+    public Player getPlayer2() {
+        return player2;
+    }
+    public Board getCurrentBoard() {
+        return currentBoard;
+    }
+    public Board getNewBoard() {
+        return newBoard;
+    }
+    public ImageView[] getCounterViews() {
+        return counterViews;
+    }
+    public boolean isAgainstComputer() {
+        return againstComputer;
+    }
+    public boolean isPlayer1Black() {
+        return player1Black;
+    }
+    public boolean isPlayer1Turn() {
+        return player1Turn;
+    }
 
     public int[][] displayCoordinates; //holds pixel coordinates for various points on the grid.
-
-    //default constructor, againstCOmputer and player1Black both true
-    public Game(){
-        //is the game against the computer? Which player is black?
-        this.againstComputer = true;
-        this.player1Black = true;
-
-        //set up player 1; they are always human
-        player1 = new Player(player1Black, true);
-
-        //set up player 2; can be human or AI
-        player2 = new Player(!player1Black, !againstComputer);
-
-        //create the board; first player to move is black
-        currentBoard = new Board();
-        player1Turn = player1Black;
-
-        //shows start pieces on board
-        displayMove();
-    }
 
     //constructor sets up initial details of the game and displays them
     public Game(int[][] displayCoordinates, boolean againstComputer, boolean player1Black) {
 
-        //save coordinates
-        this.displayCoordinates = displayCoordinates;
+        player1 = new Player(player1Black, true); //set up player 1; they are always human
+        player2 = new Player(!player1Black, !againstComputer); //set up player 2; can be human or AI
 
-        //is the game against the computer? Which player is black?
-        this.againstComputer = againstComputer;
+        this.againstComputer = againstComputer; //is the game against the computer? Which player is black?
         this.player1Black = player1Black;
-
-        //set up player 1; they are always human
-        player1 = new Player(player1Black, true);
-
-        //set up player 2; can be human or AI
-        player2 = new Player(!player1Black, !againstComputer);
 
         //create the board; first player to move is black
         currentBoard = new Board();
         player1Turn = player1Black;
 
-        //shows start pieces on board
-        //displayMove();
-    }
+        counterViews = new ImageView[24]; //array of counters- cannot be set to starting layout until context is known
 
-    //uses currentBoard and newBoard to animate a move taking place.
-    public void displayMove(){
-
+        this.displayCoordinates = displayCoordinates; //save coordinates
     }
 
     //creates ImageViews for counter positions, based on context of activity and coordinates of squares
-    public ImageView[] findCounterViews(Context context){
+    public void updateCounterViews(Context context){
 
         int counterSize = (displayCoordinates[6][0] - displayCoordinates[5][0])/2;
-
-        ImageView[] counters = new ImageView[24];
         int counterIndex = 0;
 
         int[] counterIds = new int[]{ //array of every id to assign each counter
@@ -136,12 +130,18 @@ public class Game extends AppCompatActivity {
             counterParams.topMargin = displayCoordinates[positionIndex][1];
 
             counter.setLayoutParams(counterParams);
-            counters[counterIndex] = counter;
+            counterViews[counterIndex] = counter;
             counterIndex++;
 
         }
 
-        return counters;
+    }
+
+    public void counterAt(float x, float y){
+        for (ImageView counter : counterViews){
+            System.out.println(counter.getLayoutParams().height);
+            System.out.println(counter.getLayoutParams().width);
+        }
     }
 
 }

@@ -3,13 +3,28 @@ package com.example.stuart.draughts;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GameActivity extends AppCompatActivity {
 
     public Game game;
+    RelativeLayout layout;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // MotionEvent object holds X-Y values
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            String text = "You click at x = " + event.getX() + " and y = " + event.getY();
+            System.out.println(text);
+        }
+
+        return super.onTouchEvent(event);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,13 +37,9 @@ public class GameActivity extends AppCompatActivity {
         int square0width = ((metrics.widthPixels - boardSize)/2); //first column from the left
         int square0height = ((metrics.heightPixels + boardSize/2)/2); //first row up from bottom
         int squareSize = (boardSize/8);
-        System.out.println(boardSize);
-        System.out.println(square0width);
-        System.out.println(square0height);
-        System.out.println(squareSize);
 
         //Set up relativelayout
-        RelativeLayout layout = new RelativeLayout(this);
+        layout = new RelativeLayout(this);
         layout.setBackgroundColor(getResources().getColor(R.color.background));
 
         //Set up game board
@@ -63,6 +74,12 @@ public class GameActivity extends AppCompatActivity {
         player2LabelParams.addRule(RelativeLayout.ABOVE, gameBoard.getId());
         player2LabelParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
 
+        //add views into layout
+        layout.addView(gameBoard, gameBoardParams);
+        layout.addView(player1Label, player1LabelParams);
+        layout.addView(player2Label, player2LabelParams);
+        setContentView(layout);
+
         //coordinates of each square on the board, in pixels
         int[][] coordinates = new int[][]{
                 {0,0}, {0,0}, {0,0}, {0,0}, {0,0},
@@ -78,25 +95,35 @@ public class GameActivity extends AppCompatActivity {
         };
 
         game = new Game(coordinates, true, true);
+        displayGame();
 
-        ImageView[] counters = game.findCounterViews(this);
+        game.counterAt(100, 100);
 
-        //add all views into layout
-        layout.addView(gameBoard, gameBoardParams);
-        layout.addView(player1Label, player1LabelParams);
-        layout.addView(player2Label, player2LabelParams);
-        for (ImageView counter : counters){
+        System.out.println("DONE");
+    }
+
+    //displays counters onto the screen
+    private void displayGame(){
+        //remove old counters from layout
+        for (ImageView counter : game.getCounterViews()){
+            if (counter == null){
+                break;
+            }
+            ((ViewGroup) counter.getParent()).removeView(counter);
+        }
+
+        //add in new counters
+        game.updateCounterViews(this);
+        for (ImageView counter : game.getCounterViews()){
             if (counter == null){
                 break;
             }
             layout.addView(counter);
         }
-
-        //show layout
         setContentView(layout);
-
-        System.out.println("DONE");
     }
+
+
 
 
 

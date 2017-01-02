@@ -9,6 +9,7 @@ package com.example.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -23,22 +24,18 @@ public class Game extends AppCompatActivity {
         setContentView(R.layout.activity_game);
     }
 
-    public static void main(String[] args){
+    public Player player1;
+    public Player player2;
 
-    }
-
-    Player player1;
-    Player player2;
-
-    Board currentBoard; //current board being displayed
-    Board newBoard; //board after move requested by player
+    public Board currentBoard; //current board being displayed
+    public Board newBoard; //board after move requested by player
 
     //boolean variables for details of the game
-    boolean againstComputer; //is it against AI or 2 player
-    boolean player1Black; //is player 1 black
-    boolean player1Turn; //is it player 1's turn
-    boolean inPlay; //is the game playing? (has a winner been found?)
-    boolean player1win; //has player 1 won?
+    public boolean againstComputer; //is it against AI or 2 player
+    public boolean player1Black; //is player 1 black
+    public boolean player1Turn; //is it player 1's turn
+
+    public int[][] displayCoordinates; //holds pixel coordinates for various points on the grid.
 
     //default constructor, againstCOmputer and player1Black both true
     public Game(){
@@ -61,7 +58,10 @@ public class Game extends AppCompatActivity {
     }
 
     //constructor sets up initial details of the game and displays them
-    public Game(boolean againstComputer, boolean player1Black) {
+    public Game(int[][] displayCoordinates, boolean againstComputer, boolean player1Black) {
+
+        //save coordinates
+        this.displayCoordinates = displayCoordinates;
 
         //is the game against the computer? Which player is black?
         this.againstComputer = againstComputer;
@@ -78,42 +78,70 @@ public class Game extends AppCompatActivity {
         player1Turn = player1Black;
 
         //shows start pieces on board
-        displayMove();
-    }
-
-    //runs the game overall, making players move and deciding when the game has ended
-    //does not start the game on button press, startGame() in MainMenu.java does this
-    //does not end the game, this is managed by endGame() in this class
-    public void runGame(){
-        while (inPlay) {
-            if (player1Turn){
-                newBoard = player1.makeMove(currentBoard);
-            } else {
-                newBoard = player2.makeMove(currentBoard);
-            }
-            if (newBoard.allPieces() == 0){
-                inPlay = false;
-                player1win = !player1Turn;
-                endGame();
-            }
-            displayMove();
-            player1Turn = !player1Turn;
-        }
+        //displayMove();
     }
 
     //uses currentBoard and newBoard to animate a move taking place.
     public void displayMove(){
-        //animation
-        currentBoard = newBoard; //update back end to current board
-    }
-
-
-    void endGame() {
 
     }
 
-    public void startGame(View view) {
+    //creates ImageViews for counter positions, based on context of activity and coordinates of squares
+    public ImageView[] findCounterViews(Context context){
 
+        int counterSize = (displayCoordinates[6][0] - displayCoordinates[5][0])/2;
+
+        ImageView[] counters = new ImageView[24];
+        int counterIndex = 0;
+
+        int[] counterIds = new int[]{ //array of every id to assign each counter
+                R.id.counter0, R.id.counter1, R.id.counter2, R.id.counter3, R.id.counter4, R.id.counter5,
+                R.id.counter6, R.id.counter7, R.id.counter8, R.id.counter9, R.id.counter10, R.id.counter11,
+                R.id.counter12, R.id.counter13, R.id.counter14, R.id.counter15, R.id.counter16, R.id.counter17,
+                R.id.counter18, R.id.counter19, R.id.counter20, R.id.counter21, R.id.counter22, R.id.counter23
+        };
+
+        int drawableId;
+
+        for (int positionIndex = 0; positionIndex <= 40; positionIndex++){ //for each position
+
+            //decide on image for counter
+            if (currentBoard.isBlack(positionIndex)){
+                if (currentBoard.isKing(positionIndex)){
+                    drawableId = R.drawable.redking;
+                } else {
+                    drawableId = R.drawable.redman;
+                }
+            } else if (currentBoard.isWhite(positionIndex)) {
+                if (currentBoard.isKing(positionIndex)){
+                    drawableId = R.drawable.whiteking;
+                } else {
+                    drawableId = R.drawable.whiteman;
+                }
+            } else {
+                continue; //if not black or white, continue loop
+            }
+
+            //create counter, assign ID & drawable
+            ImageView counter = new ImageView(context);
+            counter.setId(counterIds[counterIndex]);
+            counter.setImageResource(drawableId);
+
+            RelativeLayout.LayoutParams counterParams = new RelativeLayout.LayoutParams(
+                    counterSize,
+                    counterSize
+            );
+
+            counterParams.leftMargin = displayCoordinates[positionIndex][0]; //margins are fetched from coordinates array
+            counterParams.topMargin = displayCoordinates[positionIndex][1];
+
+            counter.setLayoutParams(counterParams);
+            counters[counterIndex] = counter;
+            counterIndex++;
+
+        }
+
+        return counters;
     }
 
 }

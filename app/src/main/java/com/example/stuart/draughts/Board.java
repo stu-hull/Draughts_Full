@@ -58,6 +58,11 @@ public class Board {
         return result;
     } //DONE //TESTED
 
+    //takes an integer board position and finds whether that board position is valid
+    public static Boolean isValid(int position){
+        return ((maskValid & 1L<<(long)(45-position)) != 0L);
+    }
+
     //trims the excess off of an array of Boards
     public static Board[] trim(Board[] array){
         int length = 0;

@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 public class MainMenu extends AppCompatActivity {
 
@@ -18,12 +19,9 @@ public class MainMenu extends AppCompatActivity {
         //setSupportActionBar(toolbar);
     }
 
+    //Runs when "Start Game" button on home screen is pressed- starts game activity
     public void startGame(View view) {
-        startActivityForResult(new Intent(MainMenu.this, Game.class), 1);
-        boolean againstComputer = true;
-        boolean player1black = true;
-        Game game = new Game(againstComputer, player1black);
-        game.runGame();
+        startActivity(new Intent(MainMenu.this, GameActivity.class));
     }
 
 }

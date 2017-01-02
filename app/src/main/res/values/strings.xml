@@ -1,12 +1,14 @@
 <resources>
+
     <string name="app_name">Draughts</string>
-    <string name="square_description">A square on the board</string>
-    <string name="black_square">A black square on the board</string>
-    <string name="white_square">A white square on the board</string>
-    <string name="title_activity_main_menu">MainMenu</string>
+    <string name="title_activity_main_menu">Draughts</string>
     <string name="title">Draughts</string>
+
     <string name="new_game">New Game</string>
-    <string name="gameboard_desc">The gameboard</string>
     <string name="player2">Player 2</string>
     <string name="player1">Player 1</string>
+
+    <string name="gameboard_desc">The gameboard</string>
+
+
 </resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="gameBoard" type="id"/>
+    <item name="player1Label" type="id"/>
+    <item name="player2Label" type="id"/>
+    <item name="counter0" type="id"/>
+    <item name="counter1" type="id"/>
+    <item name="counter2" type="id"/>
+    <item name="counter3" type="id"/>
+    <item name="counter4" type="id"/>
+    <item name="counter5" type="id"/>
+    <item name="counter6" type="id"/>
+    <item name="counter7" type="id"/>
+    <item name="counter8" type="id"/>
+    <item name="counter9" type="id"/>
+    <item name="counter10" type="id"/>
+    <item name="counter11" type="id"/>
+    <item name="counter12" type="id"/>
+    <item name="counter13" type="id"/>
+    <item name="counter14" type="id"/>
+    <item name="counter15" type="id"/>
+    <item name="counter16" type="id"/>
+    <item name="counter17" type="id"/>
+    <item name="counter18" type="id"/>
+    <item name="counter19" type="id"/>
+    <item name="counter20" type="id"/>
+    <item name="counter21" type="id"/>
+    <item name="counter22" type="id"/>
+    <item name="counter23" type="id"/>
+</resources>

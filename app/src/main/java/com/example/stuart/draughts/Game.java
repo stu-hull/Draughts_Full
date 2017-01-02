@@ -9,122 +9,139 @@ package com.example.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
-import android.content.Intent;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 public class Game extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game2);
+        setContentView(R.layout.activity_game);
     }
 
-    Player player1;
-    Player player2;
+    private Player player1;
+    private Player player2;
 
-    Board currentBoard; //current board being displayed
-    Board newBoard; //board after move requested by player
+    public Board currentBoard; //current board being displayed
+    private Board newBoard; //board after move requested by player
+    private ImageView[] counterViews; //counter views, for adding into the GameActivity's RelativeLayout
 
     //boolean variables for details of the game
-    boolean againstComputer; //is it against AI or 2 player
-    boolean player1Black; //is player 1 black
-    boolean player1Turn; //is it player 1's turn
-    boolean inPlay; //is the game playing? (has a winner been found?)
-    boolean player1win; //has player 1 won?
+    private boolean againstComputer; //is it against AI or 2 player
+    private boolean player1Black; //is player 1 black
+    private boolean player1Turn; //is it player 1's turn
 
-    //default constructor, againstCOmputer and player1Black both true
-    public Game(){
-        //is the game against the computer? Which player is black?
-        this.againstComputer = true;
-        this.player1Black = true;
-
-        //set up player 1; they are always human
-        player1 = new Player(player1Black, true);
-
-        //set up player 2; can be human or AI
-        player2 = new Player(!player1Black, !againstComputer);
-
-        //create the board; first player to move is black
-        currentBoard = new Board();
-        player1Turn = player1Black;
-
-        //shows start pieces on board
-        displayMove();
+    //getters for all of those
+    public Player getPlayer1() {
+        return player1;
     }
+    public Player getPlayer2() {
+        return player2;
+    }
+    public Board getCurrentBoard() {
+        return currentBoard;
+    }
+    public Board getNewBoard() {
+        return newBoard;
+    }
+    public ImageView[] getCounterViews() {
+        return counterViews;
+    }
+    public boolean isAgainstComputer() {
+        return againstComputer;
+    }
+    public boolean isPlayer1Black() {
+        return player1Black;
+    }
+    public boolean isPlayer1Turn() {
+        return player1Turn;
+    }
+
+    public int[][] displayCoordinates; //holds pixel coordinates for various points on the grid.
 
     //constructor sets up initial details of the game and displays them
-    public Game(boolean againstComputer, boolean player1Black) {
+    public Game(int[][] displayCoordinates, boolean againstComputer, boolean player1Black) {
 
-        //is the game against the computer? Which player is black?
-        this.againstComputer = againstComputer;
+        player1 = new Player(player1Black, true); //set up player 1; they are always human
+        player2 = new Player(!player1Black, !againstComputer); //set up player 2; can be human or AI
+
+        this.againstComputer = againstComputer; //is the game against the computer? Which player is black?
         this.player1Black = player1Black;
-
-        //set up player 1; they are always human
-        player1 = new Player(player1Black, true);
-
-        //set up player 2; can be human or AI
-        player2 = new Player(!player1Black, !againstComputer);
 
         //create the board; first player to move is black
         currentBoard = new Board();
         player1Turn = player1Black;
 
-        //shows start pieces on board
-        displayMove();
+        counterViews = new ImageView[24]; //array of counters- cannot be set to starting layout until context is known
+
+        this.displayCoordinates = displayCoordinates; //save coordinates
     }
 
-    //runs the game overall, making players move and deciding when the game has ended
-    //does not start the game on button press, startGame() in MainMenu.java does this
-    //does not end the game, this is managed by endGame() in this class
-    public void runGame(){
-        while (inPlay) {
-            if (player1Turn){
-                newBoard = player1.makeMove(currentBoard);
+    //creates ImageViews for counter positions, based on context of activity and coordinates of squares
+    public void updateCounterViews(Context context){
+
+        int counterSize = (displayCoordinates[6][0] - displayCoordinates[5][0])/2;
+        int counterIndex = 0;
+
+        int[] counterIds = new int[]{ //array of every id to assign each counter
+                R.id.counter0, R.id.counter1, R.id.counter2, R.id.counter3, R.id.counter4, R.id.counter5,
+                R.id.counter6, R.id.counter7, R.id.counter8, R.id.counter9, R.id.counter10, R.id.counter11,
+                R.id.counter12, R.id.counter13, R.id.counter14, R.id.counter15, R.id.counter16, R.id.counter17,
+                R.id.counter18, R.id.counter19, R.id.counter20, R.id.counter21, R.id.counter22, R.id.counter23
+        };
+
+        int drawableId;
+
+        for (int positionIndex = 0; positionIndex <= 40; positionIndex++){ //for each position
+
+            //decide on image for counter
+            if (currentBoard.isBlack(positionIndex)){
+                if (currentBoard.isKing(positionIndex)){
+                    drawableId = R.drawable.redking;
+                } else {
+                    drawableId = R.drawable.redman;
+                }
+            } else if (currentBoard.isWhite(positionIndex)) {
+                if (currentBoard.isKing(positionIndex)){
+                    drawableId = R.drawable.whiteking;
+                } else {
+                    drawableId = R.drawable.whiteman;
+                }
             } else {
-                newBoard = player2.makeMove(currentBoard);
+                continue; //if not black or white, continue loop
             }
-            if (newBoard.allPieces() == 0){
-                inPlay = false;
-                player1win = !player1Turn;
-                endGame();
-            }
-            displayMove();
-            player1Turn = !player1Turn;
+
+            //create counter, assign ID & drawable
+            ImageView counter = new ImageView(context);
+            counter.setId(counterIds[counterIndex]);
+            counter.setImageResource(drawableId);
+
+            RelativeLayout.LayoutParams counterParams = new RelativeLayout.LayoutParams(
+                    counterSize,
+                    counterSize
+            );
+
+            counterParams.leftMargin = displayCoordinates[positionIndex][0]; //margins are fetched from coordinates array
+            counterParams.topMargin = displayCoordinates[positionIndex][1];
+
+            counter.setLayoutParams(counterParams);
+            counterViews[counterIndex] = counter;
+            counterIndex++;
+
+        }
+
+    }
+
+    public void counterAt(float x, float y){
+        for (ImageView counter : counterViews){
+            System.out.println(counter.getLayoutParams().height);
+            System.out.println(counter.getLayoutParams().width);
         }
     }
-
-    //uses currentBoard and newBoard to animate a move taking place.
-    public void displayMove(){
-        //animation
-        currentBoard = newBoard; //update back end to current board
-    }
-
-
-    void endGame() {
-
-    }
-
-    public void startGame(View view) {
-        Intent intent = new Intent(this, Game.class);
-        startActivity(intent);
-        ImageView[] counters = findCounters();
-        counters[0].setX(200);
-        counters[0].setY(200);
-        Game game = new Game();
-        game.runGame();
-    }
-
-    //function finds each of the counters on the board as an array, using findViewById
-    private ImageView[] findCounters(){
-        ImageView[] list = new ImageView[24];
-        list[0] = (ImageView) findViewById(R.id.blackCounter0);
-
-        return list;
-    }
-
 
 }

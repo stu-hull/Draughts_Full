@@ -29,7 +29,7 @@ public class GameActivity extends AppCompatActivity {
 
             if (game.isPlayer1Turn() || !(game.isAgainstComputer())) { //if it's a human's turn, the user needs to input
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
-                game.userInput(bit); //pass on input to game to deal with
+                Boolean turnFinished = game.userInput(bit); //pass on input to game to deal with
                 displayGame();
             }
         }
@@ -105,7 +105,7 @@ public class GameActivity extends AppCompatActivity {
                 {0,0}, {0,0}, {0,0}, {0,0}, {0,0}
         };
 
-        game = new Game(coordinates, true, true);
+        game = new Game(coordinates, getIntent().getBooleanExtra("AGAINST_COMPUTER", true), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
         displayGame();
 
         System.out.println("DONE");

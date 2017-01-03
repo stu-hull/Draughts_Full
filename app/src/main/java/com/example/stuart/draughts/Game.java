@@ -10,9 +10,6 @@ package com.example.stuart.draughts;
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -47,23 +44,23 @@ public class Game {
     public Board getNewBoard() {
         return newBoard;
     }
-    public ImageView[] getCounterViews() {
+    ImageView[] getCounterViews() {
         return counterViews;
     }
-    public boolean isAgainstComputer() {
+    boolean isAgainstComputer() {
         return againstComputer;
     }
-    public boolean isPlayer1Black() {
+    private boolean isPlayer1Black() {
         return player1Black;
     }
-    public boolean isPlayer1Turn() {
+    boolean isPlayer1Turn() {
         return player1Turn;
     }
 
     private int[][] displayCoordinates; //holds pixel coordinates for various points on the grid.
 
     //constructor sets up initial details of the game and displays them
-    public Game(int[][] displayCoordinates, boolean againstComputer, boolean player1Black) {
+    Game(int[][] displayCoordinates, boolean againstComputer, boolean player1Black) {
 
         player1 = new Player(player1Black, true); //set up player 1; they are always human
         player2 = new Player(!player1Black, !againstComputer); //set up player 2; can be human or AI
@@ -83,7 +80,7 @@ public class Game {
     }
 
     //creates ImageViews for counter positions, based on context of activity and coordinates of squares
-    public void updateCounterViews(Context context){
+    void updateCounterViews(Context context){
 
         int counterSize = (displayCoordinates[6][0] - displayCoordinates[5][0])/2;
         int counterIndex = 0;
@@ -143,11 +140,8 @@ public class Game {
 
     }
 
-    private void updateLegalMoves(){
-        legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
-    }
-
-    public void userInput(int bit){
+    //allows user touch to be passed into game to figure out what to display to the user. The function also returns true if the user's turn is now complete, or false if they have to keep clicking
+    Boolean userInput(int bit){
         if (againstComputer && !(player1Turn)){
             throw new IllegalStateException("userInput called when no user input is required");
         }
@@ -175,9 +169,10 @@ public class Game {
                         if (!(onlyMultiJump)) {
                             System.out.println("2.1.1.1.1 Not in multijump- confirm move, reset, unhighlight");
                             currentBoard = newBoard;
-                            legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
                             highlighted = -1;
                             player1Turn = !player1Turn;
+                            legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
+                            return true;
                         }
                     } else {
                         System.out.println("2.1.1.2 Move requested is a jump");
@@ -191,10 +186,11 @@ public class Game {
                         } else { //if no further jumps, make move, change player to nextPlayer and reset
                             System.out.println("2.1.1.2.2 Move has no further jumps- confirm move, reset and unhighlight");
                             currentBoard = newBoard;
-                            legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
                             highlighted = -1;
                             player1Turn = !player1Turn;
                             onlyMultiJump = false;
+                            legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
+                            return true;
                         }
                     }
                 } else {
@@ -207,16 +203,19 @@ public class Game {
             } else if (onlyMultiJump){
                 System.out.println("2.2 Tapped on counter but in multijump");
                 if (bit == highlighted) { //if doing a multijump and the player taps the piece, stop the jump and end the turn (if they tap another piece, ignore
+                    System.out.println("2.2.1 Tapped on highlighted counter, stop jump");
                     highlighted = -1;
                     player1Turn = !player1Turn;
                     onlyMultiJump = false;
-                    System.out.println("2.2.1 Tapped on highlighted counter, stop jump");
+                    legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
+                    return true;
                 }
             } else {
-                highlighted = -1; //else reset
                 System.out.println("2.3 Tapped on counter, unhighlight");
+                highlighted = -1; //else reset
             }
         }
+        return false;
     }
 
 }

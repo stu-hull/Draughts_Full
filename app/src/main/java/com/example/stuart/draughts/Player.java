@@ -42,7 +42,7 @@ public class Player {
     private boolean isHuman;
 
     //initialiser, sets player colour and type
-    public Player(boolean isBlack, boolean isHuman){
+    Player(boolean isBlack, boolean isHuman){
         this.isBlack = isBlack;
         this.isHuman = isHuman;
     } //DONE //TESTED

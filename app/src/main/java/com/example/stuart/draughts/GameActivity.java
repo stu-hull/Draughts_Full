@@ -26,8 +26,12 @@ public class GameActivity extends AppCompatActivity {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
             String text = "You click at x = " + event.getX() + " and y = " + event.getY();
             System.out.println(text);
-            int bit = touchToBit((int)event.getX(), (int)event.getY());
-            System.out.println(bit);
+
+            if (game.isPlayer1Turn() || !(game.isAgainstComputer())) { //if it's a human's turn, the user needs to input
+                int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
+                game.userInput(bit); //pass on input to game to deal with
+                displayGame();
+            }
         }
 
         return super.onTouchEvent(event);
@@ -104,8 +108,6 @@ public class GameActivity extends AppCompatActivity {
         game = new Game(coordinates, true, true);
         displayGame();
 
-        game.counterAt(100, 100);
-
         System.out.println("DONE");
     }
 
@@ -138,9 +140,6 @@ public class GameActivity extends AppCompatActivity {
         int squareNumX = -1;
         int squareNumY = -1;
 
-        System.out.println(squareLeftEdge);
-        System.out.println(squareBottomEdge);
-
         while (x > squareLeftEdge){
             squareNumX ++;
             squareLeftEdge += squareSize;
@@ -167,9 +166,5 @@ public class GameActivity extends AppCompatActivity {
 
 
     }
-
-
-
-
 
 }

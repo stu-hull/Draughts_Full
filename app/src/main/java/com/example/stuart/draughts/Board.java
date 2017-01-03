@@ -136,6 +136,9 @@ public class Board {
     public boolean isKing(int position){
         return ((findMask(position) & kings) != 0);
     }  //returns true if a given position has a king
+    public boolean isEmpty(int position){
+        return (!(isBlack(position)) && !(isWhite(position)) && isValid(position));
+    } //returns true if a given position is valid but has no black or white pieces
     public int blackCount(long mask){
         return Long.bitCount(blackPieces & mask);
     } //returns the number of black pieces under a given mask
@@ -287,7 +290,7 @@ public class Board {
     } //...DONE //TESTED
 
     //looks at a single piece which has just jumped, and returns all possible multi jumps it can do afterwards as well as the single jump
-    private Board[] findMultiJump(int position){
+    public Board[] findMultiJump(int position){
         long positionMask = findMask(position);
 
         boolean jumpLF;

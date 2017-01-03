@@ -25,7 +25,7 @@ public class Board {
 
     }
 
-    public void realBoard(){
+    void realBoard(){
         blackPieces = 0b0000010110000000010011000000000000000000000000L;
         whitePieces = 0b0000001000000010000100010000001001110001100000L;
         kings       = 0b0000001000000000000000000000000000000000000000L;
@@ -44,13 +44,13 @@ public class Board {
     */
 
     //useful masks for different types of squares on the board
-    public static long maskValid = 0b0000011110111111110111111110111111110111100000L; //all the valid board squares (the 0s are padding)
-    public static long maskBlackBack = 0b0000011110000000000000000000000000000000000000L; //the home row squares for black
-    public static long maskWhiteBack = 0b0000000000000000000000000000000000000111100000L; //the home row squares for white
-    public static long maskCenter = 0b0000000000000000000011001100000000000000000000L; //the central 8 squares (4 playable squares)
+    private static long maskValid = 0b0000011110111111110111111110111111110111100000L; //all the valid board squares (the 0s are padding)
+    static long maskBlackBack = 0b0000011110000000000000000000000000000000000000L; //the home row squares for black
+    static long maskWhiteBack = 0b0000000000000000000000000000000000000111100000L; //the home row squares for white
+    static long maskCenter = 0b0000000000000000000011001100000000000000000000L; //the central 8 squares (4 playable squares)
 
     //takes an integer board position, and creates a mask for that position
-    public static long findMask(int position){
+    private static long findMask(int position){
         long result = 1;
         for (int i=0; i<(45-position); i++){ //raises 2 to the power of (45-position), no easier way to do this in java (Math.pow is an approximation)
             result *= 2;
@@ -59,12 +59,12 @@ public class Board {
     } //DONE //TESTED
 
     //takes an integer board position and finds whether that board position is valid
-    public static Boolean isValid(int position){
+    private static Boolean isValid(int position){
         return ((maskValid & 1L<<(long)(45-position)) != 0L);
     }
 
     //trims the excess off of an array of Boards
-    public static Board[] trim(Board[] array){
+    private static Board[] trim(Board[] array){
         int length = 0;
         while (array[length] != null){
             length += 1;
@@ -79,28 +79,28 @@ public class Board {
     private long whitePieces; //stores the location of all white pieces
     private long kings; //stores the location of every king, black or white
 
-    public long getBlackPieces(){
+    long getBlackPieces(){
         return blackPieces;
     } //getters for each bitboard
-    public long getWhitePieces() {
+    long getWhitePieces() {
         return whitePieces;
     }
-    public long getKings() {
+    long getKings() {
         return kings;
     }
 
     //constructors / methods to set up the board
-    public Board(){
+    Board(){
         blackPieces = 0b0000011110111111110000000000000000000000000000L;
         whitePieces = 0b0000000000000000000000000000111111110111100000L;
         kings =       0b0000000000000000000000000000000000000000000000L;
     } //default constructor sets up a board in the starting position
-    public void nullBoard(){
+    void nullBoard(){
         blackPieces = 0b0000000000000000000000000000000000000000000000L;
         whitePieces = 0b0000000000000000000000000000000000000000000000L;
         kings =       0b0000000000000000000000000000000000000000000000L;
     } //sets up a board with no pieces on, the players return this as their best move if they cannot play
-    public void copyBoard(Board original){
+    private void copyBoard(Board original){
         blackPieces = original.getBlackPieces();
         whitePieces = original.getWhitePieces();
         kings = original.getKings();
@@ -113,33 +113,36 @@ public class Board {
     public long whiteMen(){
         return whitePieces & ~kings;
     } //white men excluding kings
-    public long blackKings(){
+    long blackKings(){
         return blackPieces & kings;
     } //black kings only
-    public long whiteKings(){
+    long whiteKings(){
         return whitePieces & kings;
     } //white kings only
-    public long allPieces(){
+    private long allPieces(){
         return blackPieces | whitePieces;
     } //all pieces, black and white
-    public long emptySquares() {
+    private long emptySquares() {
         return ~allPieces() & maskValid;
     } //empty squares (valid squares not black nor white)
 
     //methods to query the board
-    public boolean isBlack(int position){
+    boolean isBlack(int position){
         return ((findMask(position) & blackPieces) != 0);
     } //returns true if a given position has a black piece
-    public boolean isWhite(int position){
+    boolean isWhite(int position){
         return ((findMask(position) & whitePieces) != 0);
     } //returns true if a given position has a white piece
-    public boolean isKing(int position){
+    boolean isKing(int position){
         return ((findMask(position) & kings) != 0);
     }  //returns true if a given position has a king
-    public int blackCount(long mask){
+    boolean isEmpty(int position){
+        return (!(isBlack(position)) && !(isWhite(position)) && isValid(position));
+    } //returns true if a given position is valid but has no black or white pieces
+    int blackCount(long mask){
         return Long.bitCount(blackPieces & mask);
     } //returns the number of black pieces under a given mask
-    public int whiteCount(long mask){
+    int whiteCount(long mask){
         return Long.bitCount(whitePieces & mask);
     } //returns the number of white pieces under a given mask
     public int allCount(long mask){
@@ -147,7 +150,7 @@ public class Board {
     } //returns the number of pieces, black or white, under a given mask
 
     //moves one piece, either sliding or a single capture (NO multiple captures) (returns new board, leaves old board)
-    public Board makeSimpleMove(int source, int destination){
+    Board makeSimpleMove(int source, int destination){
 
         Board afterMove = new Board();
         afterMove.copyBoard(this);
@@ -182,7 +185,7 @@ public class Board {
     }  //...DONE //TESTED
 
     //finds all legal moves for a given player.
-    public Board[] findMoves(boolean isBlack){
+    Board[] findMoves(boolean isBlack){
 
         long jumpersLF;
         long jumpersRF;
@@ -287,7 +290,7 @@ public class Board {
     } //...DONE //TESTED
 
     //looks at a single piece which has just jumped, and returns all possible multi jumps it can do afterwards as well as the single jump
-    private Board[] findMultiJump(int position){
+    Board[] findMultiJump(int position){
         long positionMask = findMask(position);
 
         boolean jumpLF;

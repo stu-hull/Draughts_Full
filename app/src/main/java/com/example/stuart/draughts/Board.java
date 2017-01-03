@@ -172,9 +172,15 @@ public class Board {
         if (isBlack(source)){
             afterMove.blackPieces -= findMask(source);
             afterMove.blackPieces += findMask(destination);
+            if (destination >= 37 && !(afterMove.isKing(source))){ //if at end and counter's not a king already, make a king
+                afterMove.kings += findMask(destination);
+            }
         } else {
             afterMove.whitePieces -= findMask(source);
             afterMove.whitePieces += findMask(destination);
+            if (destination <= 8 && !(afterMove.isKing(source))){ //if at end and counter's not a king already, make a king
+                afterMove.kings += findMask(destination);
+            }
         }
         if (isKing(source)){ //if king, king bit indicator must move too
             afterMove.kings -= findMask(source);

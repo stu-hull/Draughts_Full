@@ -94,14 +94,16 @@ public class Game {
 
         int drawableId;
 
+        counterViews = new ImageView[24];
+
         for (int positionIndex = 0; positionIndex <= 40; positionIndex++) { //for each position
 
             //decide on image for counter
             if (positionIndex == highlighted && (currentBoard.isBlack(positionIndex) || currentBoard.isWhite(positionIndex))){
                 if (currentBoard.isKing(positionIndex)) {
-                    drawableId = R.drawable.manhighlighted;
-                } else {
                     drawableId = R.drawable.kinghighlighted;
+                } else {
+                    drawableId = R.drawable.manhighlighted;
                 }
             } else if (currentBoard.isBlack(positionIndex)){
                 if (currentBoard.isKing(positionIndex)){
@@ -177,7 +179,7 @@ public class Game {
                     } else {
                         System.out.println("2.1.1.2 Move requested is a jump");
                         Board[] newNewBoards = newBoard.findMultiJump(bit); //find all further possible jumps
-                        if (newNewBoards.length > 0) { //if more jumps available, make move, keep piece highlighted, and record that only multi jumps allowed
+                        if (newNewBoards.length > 1) { //if more jumps available, make move, keep piece highlighted, and record that only multi jumps allowed
                             System.out.println("2.1.1.2.1 Move has further jump options- onlymultijump enabled, piece moved and highlighted");
                             currentBoard = newBoard;
                             legalMoves = currentBoard.findMultiJump(bit); //only legal moves are the multi jump ones

@@ -94,6 +94,8 @@ public class Game {
 
         int drawableId;
 
+        counterViews = new ImageView[24];
+
         for (int positionIndex = 0; positionIndex <= 40; positionIndex++) { //for each position
 
             //decide on image for counter

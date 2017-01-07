@@ -29,8 +29,16 @@ public class GameActivity extends AppCompatActivity {
 
             if (game.isPlayer1Turn() || !(game.isAgainstComputer())) { //if it's a human's turn, the user needs to input
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
-                Boolean turnFinished = game.userInput(bit); //pass on input to game to deal with
+                Boolean endTurn = game.userInput(bit); //pass on input to game to deal with
                 displayGame();
+                System.out.println("Your move displayed");
+                if (endTurn && game.isAgainstComputer()){
+                    game.currentBoard = game.getPlayer2().makeMove(game.currentBoard);
+                    game.player1Turn = true;
+                    game.legalMoves = game.currentBoard.findMoves(true);
+                }
+                displayGame();
+                System.out.println("My move displayed");
             }
         }
 

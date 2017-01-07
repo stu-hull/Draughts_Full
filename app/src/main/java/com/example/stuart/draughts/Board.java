@@ -256,33 +256,11 @@ public class Board {
                     }
                 }
                 if ((jumpersRB & Board.findMask(position)) != 0) { //if it can jump RB
-                    System.out.println("A piece can jump RB");
                     Board afterJump = this.makeSimpleMove(position, position-8); //make the jump
                     if (!(afterJump.isKing(position-8)) && position <= 17){ //if piece is a man and on back row
-                        System.out.println("A man can jump and become a king");
-                        System.out.println(position);
-                        System.out.println(position-8);
-                        System.out.println(afterJump.kings);
                         afterJump.kings += 1L<<(long)(45-(position-8)); //make piece a king
-                        System.out.println(afterJump.kings);
-                        int count = 0;
-                        for (Board move : totalMoves){
-                            if (move == null){
-                                break;
-                            }
-                            count++;
-                        }
-                        System.out.println(count);
                         totalMoves[totalMoveCount] = afterJump;
                         totalMoveCount ++;
-                        count = 0;
-                        for (Board move : totalMoves){
-                            if (move == null){
-                                break;
-                            }
-                            count++;
-                        }
-                        System.out.println(count);
                     } else { //only check for multijumps if didnt become a king
                         furtherMoves = afterJump.findMultiJump(position - 8); //check for all further moves from that position
                         System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total

@@ -5,6 +5,10 @@
     <string name="title">Draughts</string>
 
     <string name="new_game">New Game</string>
+    <string name="computer_toggle">Computer Opponent</string>
+    <string name="computer_on">on</string>
+    <string name="computer_off">off</string>
+
     <string name="player2">Player 2</string>
     <string name="player1">Player 1</string>
 

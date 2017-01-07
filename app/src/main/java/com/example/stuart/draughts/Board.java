@@ -221,27 +221,51 @@ public class Board {
             for (int position = 5; position <= 40; position++) { //go through all board positions
                 if ((jumpersLF & findMask(position)) != 0) { //if it can jump LF
                     Board afterJump = this.makeSimpleMove(position, position+8); //make the jump
-                    furtherMoves = afterJump.findMultiJump(position+8); //check for all further moves from that position
-                    System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
-                    totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
+                    if (!(afterJump.isKing(position+8)) && position >= 28){ //if piece is a man and on back row
+                        afterJump.kings += 1L<<(long)(45-(position+8)); //make piece a king
+                        System.arraycopy(new Board[]{afterJump}, 0, totalMoves, totalMoveCount, 1);
+                        totalMoveCount ++;
+                    } else { //only check for multijumps if didnt become a king
+                        furtherMoves = afterJump.findMultiJump(position + 8); //check for all further moves from that position
+                        totalMoves[totalMoveCount] = afterJump;
+                        totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
+                    }
                 }
                 if ((jumpersRF & findMask(position)) != 0) { //if it can jump RF
                     Board afterJump = this.makeSimpleMove(position, position+10); //make the jump
-                    furtherMoves = afterJump.findMultiJump(position+10); //check for all further moves from that position
-                    System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
-                    totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
+                    if (!(afterJump.isKing(position+10)) && position >= 28){ //if piece is a man and on back row
+                        afterJump.kings += 1L<<(long)(45-(position+10)); //make piece a king
+                        System.arraycopy(new Board[]{afterJump}, 0, totalMoves, totalMoveCount, 1);
+                        totalMoveCount ++;
+                    } else { //only check for multijumps if didnt become a king
+                        furtherMoves = afterJump.findMultiJump(position + 10); //check for all further moves from that position
+                        totalMoves[totalMoveCount] = afterJump;
+                        totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
+                    }
                 }
                 if ((jumpersLB & Board.findMask(position)) != 0) { //if it can jump LB
                     Board afterJump = this.makeSimpleMove(position, position-10); //make the jump
-                    furtherMoves = afterJump.findMultiJump(position-10); //check for all further moves from that position
-                    System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
-                    totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
+                    if (!(afterJump.isKing(position-10)) && position <= 17){ //if piece is a man and on back row
+                        afterJump.kings += 1L<<(long)(45-(position-10)); //make piece a king
+                        totalMoves[totalMoveCount] = afterJump;
+                        totalMoveCount ++;
+                    } else { //only check for multijumps if didnt become a king
+                        furtherMoves = afterJump.findMultiJump(position - 10); //check for all further moves from that position
+                        System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
+                        totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
+                    }
                 }
                 if ((jumpersRB & Board.findMask(position)) != 0) { //if it can jump RB
                     Board afterJump = this.makeSimpleMove(position, position-8); //make the jump
-                    furtherMoves = afterJump.findMultiJump(position-8); //check for all further moves from that position
-                    System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
-                    totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
+                    if (!(afterJump.isKing(position-8)) && position <= 17){ //if piece is a man and on back row
+                        afterJump.kings += 1L<<(long)(45-(position-8)); //make piece a king
+                        totalMoves[totalMoveCount] = afterJump;
+                        totalMoveCount ++;
+                    } else { //only check for multijumps if didnt become a king
+                        furtherMoves = afterJump.findMultiJump(position - 8); //check for all further moves from that position
+                        System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
+                        totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
+                    }
                 }
             }
 
@@ -338,24 +362,40 @@ public class Board {
         // if the piece can jump in a direction, set furtherBoard to the result, recursively find all moves from that new position, and add them to the total moves
         if (jumpLF){
             furtherBoard = this.makeSimpleMove(position, position+8);
-            furtherMoves = furtherBoard.findMultiJump(position+8);
+            if (this.kings < furtherBoard.kings){
+                furtherMoves = new Board[]{furtherBoard};
+            } else {
+                furtherMoves = furtherBoard.findMultiJump(position + 8);
+            }
             System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length);
             totalMoveCount += furtherMoves.length;
         }
         if (jumpRF){
             furtherBoard = this.makeSimpleMove(position, position+10);
-            furtherMoves = furtherBoard.findMultiJump(position+10);
+            if (this.kings < furtherBoard.kings){
+                furtherMoves = new Board[]{furtherBoard};
+            } else {
+                furtherMoves = furtherBoard.findMultiJump(position + 10);
+            }
             System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length);
             totalMoveCount += furtherMoves.length;
         }
         if (jumpLB){
             furtherBoard = this.makeSimpleMove(position, position-10);
-            furtherMoves = furtherBoard.findMultiJump(position-10);
+            if (this.kings < furtherBoard.kings){
+                furtherMoves = new Board[]{furtherBoard};
+            } else {
+                furtherMoves = furtherBoard.findMultiJump(position - 10);
+            }
             System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length);
             totalMoveCount += furtherMoves.length;
         } if (jumpRB){
             furtherBoard = this.makeSimpleMove(position, position-8);
-            furtherMoves = furtherBoard.findMultiJump(position-8);
+            if (this.kings < furtherBoard.kings){
+                furtherMoves = new Board[]{furtherBoard};
+            } else {
+                furtherMoves = furtherBoard.findMultiJump(position - 8);
+            }
             System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length);
         }
 

@@ -18,15 +18,15 @@ public class Game {
     private Player player1;
     private Player player2;
 
-    private Board currentBoard; //current board being displayed
+    public Board currentBoard; //current board being displayed
     private Board newBoard; //board after move requested by player
-    private Board[] legalMoves; //array of legal moves available
+    public Board[] legalMoves; //array of legal moves available
     private ImageView[] counterViews; //counter views, for adding into the GameActivity's RelativeLayout
 
     //boolean variables for details of the game
     private boolean againstComputer; //is it against AI or 2 player
     private boolean player1Black; //is player 1 black
-    private boolean player1Turn; //is it player 1's turn
+    public boolean player1Turn; //is it player 1's turn
 
     private int highlighted = -1; //square to highlight on user interface (last one clicked), -1 means none highlighted
     private Boolean onlyMultiJump = false;
@@ -71,7 +71,6 @@ public class Game {
         //create the board; first player to move is black
         currentBoard = new Board();
         legalMoves = currentBoard.findMoves(true);
-        System.out.println(legalMoves.length);
         player1Turn = player1Black;
 
         counterViews = new ImageView[24]; //array of counters- cannot be set to starting layout until context is known
@@ -144,6 +143,7 @@ public class Game {
 
     //allows user touch to be passed into game to figure out what to display to the user. The function also returns true if the user's turn is now complete, or false if they have to keep clicking
     Boolean userInput(int bit){
+        System.out.println(legalMoves.length);
         if (againstComputer && !(player1Turn)){
             throw new IllegalStateException("userInput called when no user input is required");
         }
@@ -160,8 +160,15 @@ public class Game {
                 newBoard = currentBoard.makeSimpleMove(highlighted, bit); //make move on new board
                 Boolean legal = false;
                 for (Board move : legalMoves) { //test if legal
+                    System.out.println(Long.toBinaryString(newBoard.getBlackPieces()));
+                    System.out.println(Long.toBinaryString(newBoard.getKings()));
+                    System.out.println(Long.toBinaryString(newBoard.getWhitePieces()));
+                    System.out.println(Long.toBinaryString(move.getBlackPieces()));
+                    System.out.println(Long.toBinaryString(move.getKings()));
+                    System.out.println(Long.toBinaryString(move.getWhitePieces()));
                     if (move.getBlackPieces() == newBoard.getBlackPieces() && move.getWhitePieces() == newBoard.getWhitePieces() && move.getKings() == newBoard.getKings()) {
                         legal = true;
+                        break;
                     }
                 }
                 if (legal) {
@@ -218,6 +225,15 @@ public class Game {
             }
         }
         return false;
+    }
+
+    void something(int bit){
+        Boolean endTurn = userInput(bit);
+        if (endTurn && againstComputer){
+            currentBoard = player2.makeMove(currentBoard);
+            player1Turn = true;
+            legalMoves = currentBoard.findMoves(player1Black);
+        }
     }
 
 }

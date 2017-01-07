@@ -29,8 +29,16 @@ public class GameActivity extends AppCompatActivity {
 
             if (game.isPlayer1Turn() || !(game.isAgainstComputer())) { //if it's a human's turn, the user needs to input
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
-                Boolean turnFinished = game.userInput(bit); //pass on input to game to deal with
+                Boolean endTurn = game.userInput(bit); //pass on input to game to deal with
                 displayGame();
+                System.out.println("Your move displayed");
+                if (endTurn && game.isAgainstComputer()){
+                    game.currentBoard = game.getPlayer2().makeMove(game.currentBoard);
+                    game.player1Turn = true;
+                    game.legalMoves = game.currentBoard.findMoves(true);
+                }
+                displayGame();
+                System.out.println("My move displayed");
             }
         }
 
@@ -106,6 +114,7 @@ public class GameActivity extends AppCompatActivity {
         };
 
         game = new Game(coordinates, getIntent().getBooleanExtra("AGAINST_COMPUTER", true), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
+        System.out.println(game.isAgainstComputer());
         displayGame();
 
         System.out.println("DONE");
@@ -114,15 +123,6 @@ public class GameActivity extends AppCompatActivity {
     //displays counters onto the screen
     private void displayGame(){
         //remove old counters from layout
-        System.out.println("Length of counterViews:");
-        int x = 0;
-        for (ImageView counter : game.getCounterViews()){
-            if (counter == null){
-                break;
-            }
-            x++;
-        }
-        System.out.println(x);
         for (ImageView counter : game.getCounterViews()){
             if (counter == null){
                 break;

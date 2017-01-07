@@ -71,7 +71,6 @@ public class Game {
         //create the board; first player to move is black
         currentBoard = new Board();
         legalMoves = currentBoard.findMoves(true);
-        System.out.println(legalMoves.length);
         player1Turn = player1Black;
 
         counterViews = new ImageView[24]; //array of counters- cannot be set to starting layout until context is known
@@ -144,6 +143,7 @@ public class Game {
 
     //allows user touch to be passed into game to figure out what to display to the user. The function also returns true if the user's turn is now complete, or false if they have to keep clicking
     Boolean userInput(int bit){
+        System.out.println(legalMoves.length);
         if (againstComputer && !(player1Turn)){
             throw new IllegalStateException("userInput called when no user input is required");
         }
@@ -160,8 +160,13 @@ public class Game {
                 newBoard = currentBoard.makeSimpleMove(highlighted, bit); //make move on new board
                 Boolean legal = false;
                 for (Board move : legalMoves) { //test if legal
+                    System.out.println(newBoard.getKings());
+                    System.out.println(newBoard.getBlackPieces());
+                    System.out.println(move.getKings());
+                    System.out.println(move.getBlackPieces());
                     if (move.getBlackPieces() == newBoard.getBlackPieces() && move.getWhitePieces() == newBoard.getWhitePieces() && move.getKings() == newBoard.getKings()) {
                         legal = true;
+                        break;
                     }
                 }
                 if (legal) {

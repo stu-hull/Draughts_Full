@@ -106,6 +106,7 @@ public class GameActivity extends AppCompatActivity {
         };
 
         game = new Game(coordinates, getIntent().getBooleanExtra("AGAINST_COMPUTER", true), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
+        System.out.println(game.isAgainstComputer());
         displayGame();
 
         System.out.println("DONE");
@@ -114,15 +115,6 @@ public class GameActivity extends AppCompatActivity {
     //displays counters onto the screen
     private void displayGame(){
         //remove old counters from layout
-        System.out.println("Length of counterViews:");
-        int x = 0;
-        for (ImageView counter : game.getCounterViews()){
-            if (counter == null){
-                break;
-            }
-            x++;
-        }
-        System.out.println(x);
         for (ImageView counter : game.getCounterViews()){
             if (counter == null){
                 break;

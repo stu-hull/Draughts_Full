@@ -14,5 +14,8 @@
 
     <string name="gameboard_desc">The gameboard</string>
 
+    <string name="toast1">Computer is thinking…</string>
+    <string name="toast2">It\'s your move!</string>
+
 
 </resources>

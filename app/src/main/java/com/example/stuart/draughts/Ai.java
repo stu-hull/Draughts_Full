@@ -4,62 +4,10 @@ package com.example.stuart.draughts;
  * Created by Stuart on 30/08/2016.
  * This is the Player class, of which two are created by the game object. They can be told to make a move, and if AI can then use minimax to choose a move itself.
  */
-public class Player {
-
-    //test method
-    public static void main(String[] args){
-
-        Player steve = new Player(true, true);
-        Board testBoard = new Board();
-
-        testBoard.realBoard();
-        System.out.println(Long.toBinaryString(testBoard.getBlackPieces()));
-        System.out.println(Long.toBinaryString(testBoard.getWhitePieces()));
-        System.out.println(Long.toBinaryString(testBoard.getKings()));
-
-        double heuristic = steve.heuristicV1(testBoard);
-        System.out.println(heuristic);
-
-        Board[] allMoves = testBoard.findMoves(true);
-        for (Board move : allMoves){
-            System.out.println("");
-            System.out.println(Long.toBinaryString(move.getBlackPieces()));
-            System.out.println(Long.toBinaryString(move.getWhitePieces()));
-            System.out.println(Long.toBinaryString(move.getKings()));
-        }
-
-        Board bestMove = steve.minimax(testBoard, true, 8);
-        System.out.println("");
-        System.out.println("Move chosen:");
-        System.out.println(Long.toBinaryString(bestMove.getBlackPieces()));
-        System.out.println(Long.toBinaryString(bestMove.getWhitePieces()));
-        System.out.println(Long.toBinaryString(bestMove.getKings()));
-
-    }
-
-    //details about the player
-    private boolean isBlack;
-    private boolean isHuman;
-
-    //initialiser, sets player colour and type
-    Player(boolean isBlack, boolean isHuman){
-        this.isBlack = isBlack;
-        this.isHuman = isHuman;
-    } //DONE //TESTED
-
-    //This method is run when the game requires the player to make a move
-    public Board makeMove(Board currentBoard){
-
-        //If the player is human, the procedure to make a move is vastly different to if the player is an AI
-        if (isHuman){ //if human, update the graphics to request a move from the user
-            return currentBoard;
-        } else { //if AI, return the result of the minimax algorithm
-            return minimax(currentBoard, isBlack, 6);
-        }
-    }
+public class Ai {
 
     //This is the algorithm called by the AI, it actually runs the real algorithm on each move available and then chooses the best (the real minimax returns a value, not the best move)
-    private Board minimax(Board currentBoard, boolean isBlack, int depth){
+    public static Board minimax(Board currentBoard, boolean isBlack, int depth){
 
         Board[] availableMoves = currentBoard.findMoves(isBlack); //find all the moves available to the player
 
@@ -88,7 +36,7 @@ public class Player {
     //Version 1 of the minimax algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Testing indicates this algorithm reach 8 plies in around 5 seconds of desktop processing time
     //Special features: none (no ab pruning, no quiscience search, no hash table, nothing)
-    private double minimaxV1(Board board, boolean isBlack, int depth){
+    private static double minimaxV1(Board board, boolean isBlack, int depth){
 
         if (depth == 0){ //if maximum depth is achieved, do not search further; perform the heuristic function
             return heuristicV1(board);
@@ -121,7 +69,7 @@ public class Player {
     //Version 1 of the heuristic algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Ideas: incentives to keep back row intact, control central 8 squares, and get kings; value a piece difference greater with fewer pieces on board; blocking option?
     //MAYBE use a genetic algorithm to optimise these values?
-    private double heuristicV1(Board board){
+    private static double heuristicV1(Board board){
 
         //the relative values of board positions and other figures
         double baseValue = 100; //base value of every piece

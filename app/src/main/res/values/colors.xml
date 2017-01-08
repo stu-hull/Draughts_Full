@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="black_square">#444444</color>
     <color name="white_square">#DDDDDD</color>
+
+    <color name="background">#74baf2</color>
 </resources>

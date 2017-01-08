@@ -9,106 +9,59 @@ package com.example.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
+import android.content.Context;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
-public class Game extends AppCompatActivity {
+public class Game {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game2);
-    }
-
-    Player player1;
-    Player player2;
-
-    Board currentBoard; //current board being displayed
-    Board newBoard; //board after move requested by player
+    private Board currentBoard; //current board being displayed
+    private Board[] legalMoves; //array of legal moves available
 
     //boolean variables for details of the game
-    boolean againstComputer; //is it against AI or 2 player
-    boolean player1Black; //is player 1 black
-    boolean player1Turn; //is it player 1's turn
-    boolean inPlay; //is the game playing? (has a winner been found?)
-    boolean player1win; //has player 1 won?
+    private boolean againstComputer; //is it against AI or 2 player
+    private boolean player1Black; //is player 1 black
+    public boolean player1Turn; //is it player 1's turn
 
-    //default constructor, againstCOmputer and player1Black both true
-    public Game(){
-        //is the game against the computer? Which player is black?
-        this.againstComputer = true;
-        this.player1Black = true;
-
-        //set up player 1; they are always human
-        player1 = new Player(player1Black, true);
-
-        //set up player 2; can be human or AI
-        player2 = new Player(!player1Black, !againstComputer);
-
-        //create the board; first player to move is black
-        currentBoard = new Board();
-        player1Turn = player1Black;
-
-        //shows start pieces on board
-        displayMove();
+    //getters for all of those
+    public Board getCurrentBoard() {
+        return currentBoard;
+    }
+    public Board[] getLegalMoves(){
+        return legalMoves;
+    }
+    public boolean isAgainstComputer() {
+        return againstComputer;
+    }
+    public boolean isPlayer1Black() {
+        return player1Black;
+    }
+    public boolean isPlayer1Turn() {
+        return player1Turn;
     }
 
     //constructor sets up initial details of the game and displays them
-    public Game(boolean againstComputer, boolean player1Black) {
-
-        //is the game against the computer? Which player is black?
-        this.againstComputer = againstComputer;
+    Game( boolean againstComputer, boolean player1Black) {
+        this.againstComputer = againstComputer; //is the game against the computer? Which player is black?
         this.player1Black = player1Black;
-
-        //set up player 1; they are always human
-        player1 = new Player(player1Black, true);
-
-        //set up player 2; can be human or AI
-        player2 = new Player(!player1Black, !againstComputer);
 
         //create the board; first player to move is black
         currentBoard = new Board();
+        legalMoves = currentBoard.findMoves(true);
         player1Turn = player1Black;
-
-        //shows start pieces on board
-        displayMove();
     }
 
-    //runs the game overall, making players move and deciding when the game has ended
-    //does not start the game on button press, startGame() in MainMenu.java does this
-    //does not end the game, this is managed by endGame() in this class
-    public void runGame(){
-        while (inPlay) {
-            if (player1Turn){
-                newBoard = player1.makeMove(currentBoard);
-            } else {
-                newBoard = player2.makeMove(currentBoard);
-            }
-            if (newBoard.allPieces() == 0){
-                inPlay = false;
-                player1win = !player1Turn;
-                endGame();
-            }
-            displayMove();
+    //update currentBoard, and start new thread for AI to make a move if necessary
+    public void setCurrentBoard(Board newBoard, Boolean onlyMultiJump, int highlighted){
+        currentBoard = newBoard;
+        if (!onlyMultiJump){
             player1Turn = !player1Turn;
+            legalMoves = currentBoard.findMoves(player1Turn == player1Black);
+        } else {
+            legalMoves = currentBoard.findMultiJump(highlighted);
         }
     }
 
-    //uses currentBoard and newBoard to animate a move taking place.
-    public void displayMove(){
-        //animation
-        currentBoard = newBoard; //update back end to current board
-    }
 
 
-    void endGame() {
-
-    }
-
-    public void startGame(View view) {
-        Intent intent = new Intent(this, Game.class);
-        startActivity(intent);
-    }
 }

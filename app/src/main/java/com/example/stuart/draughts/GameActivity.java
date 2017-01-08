@@ -34,6 +34,8 @@ public class GameActivity extends AppCompatActivity {
             R.id.counter18, R.id.counter19, R.id.counter20, R.id.counter21, R.id.counter22, R.id.counter23
     };
 
+    //nullcommit
+
     //handler sends a toast message to the screen
     Handler handler = new Handler(){
         @Override

@@ -39,6 +39,8 @@ public class GameActivity extends AppCompatActivity {
     Boolean inGame = true;
     Boolean onlyMultiJump = false;
 
+    //nullcommit
+
     //handler sends a toast message to the screen
     Handler handler = new Handler(){
         @Override

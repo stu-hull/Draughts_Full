@@ -4,10 +4,10 @@ package com.example.stuart.draughts;
  * Created by Stuart on 30/08/2016.
  * This is the Player class, of which two are created by the game object. They can be told to make a move, and if AI can then use minimax to choose a move itself.
  */
-public class Ai {
+class Ai {
 
     //This is the algorithm called by the AI, it actually runs the real algorithm on each move available and then chooses the best (the real minimax returns a value, not the best move)
-    public static Board minimax(Board currentBoard, boolean isBlack, int depth){
+    static Board minimax(Board currentBoard, boolean isBlack, int depth){
 
         Board[] availableMoves = currentBoard.findMoves(isBlack); //find all the moves available to the player
 
@@ -74,8 +74,8 @@ public class Ai {
         //the relative values of board positions and other figures
         double baseValue = 100; //base value of every piece
         double kingValue = 100; //kings are worth x more than base value
-        double backValue = 50; //pieces at the back are worth x more than base value
-        double centerValue = 20; //pieces in the center are worth x more than base value
+        double backValue = 20; //pieces at the back are worth x more than base value
+        double centerValue = 0; //pieces in the center are worth x more than base value
         double ratioConstant = 0; //changes the weight of a difference in piece count
 
         double score = 0;

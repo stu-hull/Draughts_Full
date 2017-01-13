@@ -24,15 +24,20 @@ public class GameActivity extends AppCompatActivity {
     int squareSize;
     int[][] coordinates;
 
+    //Views for different parts of the layout
     ImageView[] counterViews = new ImageView[24];
-    int highlighted;
-    Boolean onlyMultiJump = false;
     static int[] counterIds = new int[]{ //array of every id to assign each counter
             R.id.counter0, R.id.counter1, R.id.counter2, R.id.counter3, R.id.counter4, R.id.counter5,
             R.id.counter6, R.id.counter7, R.id.counter8, R.id.counter9, R.id.counter10, R.id.counter11,
             R.id.counter12, R.id.counter13, R.id.counter14, R.id.counter15, R.id.counter16, R.id.counter17,
             R.id.counter18, R.id.counter19, R.id.counter20, R.id.counter21, R.id.counter22, R.id.counter23
     };
+    TextView gameOverMessage;
+    TextView turnLabel;
+
+    int highlighted;
+    Boolean inGame = true;
+    Boolean onlyMultiJump = false;
 
     //nullcommit
 
@@ -42,12 +47,16 @@ public class GameActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             Bundle bundle = msg.getData();
             String text = bundle.getString("toastMessage");
-            Boolean bool = bundle.getBoolean("updateRequest");
+            Boolean endTurn = bundle.getBoolean("endTurn");
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(getApplicationContext(), text, duration);
             toast.show();
-            if (bool){
-                displayGame();
+            if (endTurn){
+                removeViews();
+                addCounterViews(); //add in counters
+                turnLabel.setText(R.string.player1Move);
+                layout.addView(turnLabel);
+                setContentView(layout);
             }
         }
     };
@@ -61,9 +70,21 @@ public class GameActivity extends AppCompatActivity {
         //find dimensions dynamically
         DisplayMetrics metrics = getResources().getDisplayMetrics(); //metrics holds information about the display
         boardSize = (int)(metrics.widthPixels - 50*metrics.density); //size is width of screen minus 50dp (dp is converted to px by multiplying by density)
-        square0width = ((metrics.widthPixels - boardSize)/2); //first column from the left
-        square0height = ((metrics.heightPixels + boardSize/2)/2); //first row up from bottom
         squareSize = (boardSize/8);
+        square0width = ((metrics.widthPixels - boardSize)/2); //first column from the left
+        square0height = (int) (((0.82*metrics.heightPixels + boardSize)/2));// - 1.35*squareSize); //first row up from bottom
+        coordinates = new int[][]{ //coordinates of each square on the board, in pixels
+                {0,0}, {0,0}, {0,0}, {0,0}, {0,0},
+                {square0width, square0height}, {square0width+2*squareSize, square0height},  {square0width+4*squareSize, square0height},  {square0width+6*squareSize, square0height}, {0,0},
+                {square0width+squareSize, square0height-squareSize}, {square0width+3*squareSize, square0height-squareSize}, {square0width+5*squareSize, square0height-squareSize}, {square0width+7*squareSize, square0height-squareSize},
+                {square0width, square0height-2*squareSize}, {square0width+2*squareSize, square0height-2*squareSize},  {square0width+4*squareSize, square0height-2*squareSize},  {square0width+6*squareSize, square0height-2*squareSize}, {0,0},
+                {square0width+squareSize, square0height-3*squareSize}, {square0width+3*squareSize, square0height-3*squareSize}, {square0width+5*squareSize, square0height-3*squareSize}, {square0width+7*squareSize, square0height-3*squareSize},
+                {square0width, square0height-4*squareSize}, {square0width+2*squareSize, square0height-4*squareSize},  {square0width+4*squareSize, square0height-4*squareSize},  {square0width+6*squareSize, square0height-4*squareSize}, {0,0},
+                {square0width+squareSize, square0height-5*squareSize}, {square0width+3*squareSize, square0height-5*squareSize}, {square0width+5*squareSize, square0height-5*squareSize}, {square0width+7*squareSize, square0height-5*squareSize},
+                {square0width, square0height-6*squareSize}, {square0width+2*squareSize, square0height-6*squareSize},  {square0width+4*squareSize, square0height-6*squareSize},  {square0width+6*squareSize, square0height-6*squareSize}, {0,0},
+                {square0width+squareSize, square0height-7*squareSize}, {square0width+3*squareSize, square0height-7*squareSize}, {square0width+5*squareSize, square0height-7*squareSize}, {square0width+7*squareSize, square0height-7*squareSize},
+                {0,0}, {0,0}, {0,0}, {0,0}, {0,0}
+        };
 
         //Set up relativelayout
         layout = new RelativeLayout(this);
@@ -78,6 +99,8 @@ public class GameActivity extends AppCompatActivity {
                 boardSize);
         gameBoardParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         gameBoardParams.addRule(RelativeLayout.CENTER_VERTICAL);
+        gameBoard.setLayoutParams(gameBoardParams);
+        layout.addView(gameBoard);
 
         //set up player 1 label
         TextView player1Label = new TextView(this);
@@ -89,6 +112,8 @@ public class GameActivity extends AppCompatActivity {
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
         player1LabelParams.addRule(RelativeLayout.BELOW, gameBoard.getId());
         player1LabelParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        player1Label.setLayoutParams(player1LabelParams);
+        layout.addView(player1Label);
 
         //set up player 2 label
         TextView player2Label = new TextView(this);
@@ -100,74 +125,112 @@ public class GameActivity extends AppCompatActivity {
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
         player2LabelParams.addRule(RelativeLayout.ABOVE, gameBoard.getId());
         player2LabelParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        player2Label.setLayoutParams(player2LabelParams);
+        layout.addView(player2Label);
 
-        //add views into layout
-        layout.addView(gameBoard, gameBoardParams);
-        layout.addView(player1Label, player1LabelParams);
-        layout.addView(player2Label, player2LabelParams);
+        //set up turn label which indicates whose turn it is
+        turnLabel = new TextView(this);
+        turnLabel.setTextSize(30);
+        turnLabel.setText(R.string.player1Move);
+        RelativeLayout.LayoutParams turnLabelParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        turnLabelParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        turnLabel.setLayoutParams(turnLabelParams);
+        layout.addView(turnLabel);
 
-        //coordinates of each square on the board, in pixels
-        coordinates = new int[][]{
-                {0,0}, {0,0}, {0,0}, {0,0}, {0,0},
-                {square0width, square0height}, {square0width+2*squareSize, square0height},  {square0width+4*squareSize, square0height},  {square0width+6*squareSize, square0height}, {0,0},
-                {square0width+squareSize, square0height-squareSize}, {square0width+3*squareSize, square0height-squareSize}, {square0width+5*squareSize, square0height-squareSize}, {square0width+7*squareSize, square0height-squareSize},
-                {square0width, square0height-2*squareSize}, {square0width+2*squareSize, square0height-2*squareSize},  {square0width+4*squareSize, square0height-2*squareSize},  {square0width+6*squareSize, square0height-2*squareSize}, {0,0},
-                {square0width+squareSize, square0height-3*squareSize}, {square0width+3*squareSize, square0height-3*squareSize}, {square0width+5*squareSize, square0height-3*squareSize}, {square0width+7*squareSize, square0height-3*squareSize},
-                {square0width, square0height-4*squareSize}, {square0width+2*squareSize, square0height-4*squareSize},  {square0width+4*squareSize, square0height-4*squareSize},  {square0width+6*squareSize, square0height-4*squareSize}, {0,0},
-                {square0width+squareSize, square0height-5*squareSize}, {square0width+3*squareSize, square0height-5*squareSize}, {square0width+5*squareSize, square0height-5*squareSize}, {square0width+7*squareSize, square0height-5*squareSize},
-                {square0width, square0height-6*squareSize}, {square0width+2*squareSize, square0height-6*squareSize},  {square0width+4*squareSize, square0height-6*squareSize},  {square0width+6*squareSize, square0height-6*squareSize}, {0,0},
-                {square0width+squareSize, square0height-7*squareSize}, {square0width+3*squareSize, square0height-7*squareSize}, {square0width+5*squareSize, square0height-7*squareSize}, {square0width+7*squareSize, square0height-7*squareSize},
-                {0,0}, {0,0}, {0,0}, {0,0}, {0,0}
-        };
+        //set up game over message
+        gameOverMessage = new TextView(this);
+        gameOverMessage.setTextSize(50);
+        RelativeLayout.LayoutParams gameOverMessageParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        gameOverMessageParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        gameOverMessageParams.addRule(RelativeLayout.CENTER_VERTICAL);
+        gameOverMessage.setLayoutParams(gameOverMessageParams);
 
-        game = new Game(getIntent().getBooleanExtra("AGAINST_COMPUTER", true), getIntent().getBooleanExtra("PLAYER_1_BLACK", true)); //set up game with passed in extras
+        //set up game with passed in extras
+        game = new Game(getIntent().getBooleanExtra("AGAINST_COMPUTER", true), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
 
-        updateCounterViews();
-        for (ImageView counter : counterViews){ //add counter views into layout
-            if (counter == null){
-                break;
-            }
-            layout.addView(counter);
-        }
-
+        addCounterViews();
 
         setContentView(layout); //display layout
-
         System.out.println("DONE");
     }
 
-    //onTouchEvent manages screen touch and updates game as necessary (runs AI in separate thread)
+    //onTouchEvent manages screen touch and updates game as necessary, initialises new thread to run AI in
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (game.isPlayer1Turn() || !(game.isAgainstComputer())) { //if it's a human's turn, the user needs to input
+            if (!inGame) { //else if the game has ended, return to main menu upon touch
+                finish();
+
+            } else if (game.isPlayer1Turn() || !game.isAgainstComputer()) { //if it's a human's turn, the user needs to input
+
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
                 Board newBoard = userInput(bit); //pass on input to userInput to deal with
-                if (newBoard != null){ //if board returned, change currentBoard
+
+                if (newBoard != null) { //if board returned, change currentBoard
                     game.setCurrentBoard(newBoard, onlyMultiJump, highlighted);
                 }
-                displayGame(); //display new game
-                System.out.println("Your move displayed");
-                if (!game.isPlayer1Turn() && game.isAgainstComputer()){ //if computer's turn
-                    Runnable runnable = new Runnable() { //setup new thread
-                        public void run() {
-                            Message msg = handler.obtainMessage(); //send toast to handler
-                            Bundle bundle = new Bundle();
-                            bundle.putString("toastMessage", getString(R.string.toast1));
-                            bundle.putBoolean("updateRequest", false);
-                            msg.setData(bundle);
-                            handler.sendMessage(msg);
-                            game.setCurrentBoard(Ai.minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 6), false, highlighted); //run minimax algorithm in new thread
-                            msg = handler.obtainMessage(); //send toast to handler
-                            bundle = new Bundle();
-                            bundle.putString("toastMessage", getString(R.string.toast2));
-                            bundle.putBoolean("updateRequest", true);
-                            msg.setData(bundle);
-                            handler.sendMessage(msg);
+
+                removeViews(); //clear views
+
+                if (game.getLegalMoves().length == 0) { //if no moves left, game has ended
+                    inGame = false;
+                    //set up gameOverMessage depending on who won
+                    gameOverMessage.setId(R.id.gameOverMessage);
+                    if (game.isAgainstComputer() && game.isPlayer1Turn()) { //if player lost against computer
+                        gameOverMessage.setText(R.string.youLost);
+                        gameOverMessage.setTextColor(getResources().getColor(R.color.loseColour));
+                    } else {
+                        gameOverMessage.setTextColor(getResources().getColor(R.color.winColour));
+                        if (game.isAgainstComputer() && !(game.isPlayer1Turn())) { //if player 1 won against computer
+                            gameOverMessage.setText(R.string.youWon);
+                        } else if (game.isPlayer1Turn()) { //if player 2 won against human
+                            gameOverMessage.setText(R.string.player2Won);
+                        } else { //else player 1 won
+                            gameOverMessage.setText(R.string.player1Won);
                         }
-                    };
-                    Thread myThread = new Thread(runnable); //run thread
-                    myThread.start();
+                    }
+                    layout.addView(gameOverMessage);
+
+                    setContentView(layout); //GameOverMessage is only view that needs to be shown
+
+                } else { //else game still in play
+
+                    addCounterViews(); //add in counters
+                    if (game.isPlayer1Turn()) { //set message of turnLabel
+                        turnLabel.setText(R.string.player1Move);
+                    } else {
+                        turnLabel.setText(R.string.player2Move);
+                    }
+                    layout.addView(turnLabel);
+                    setContentView(layout);
+
+                    //if computer's turn, run AI in new thread
+                    if (!game.isPlayer1Turn() && game.isAgainstComputer()) {
+                        Runnable runnable = new Runnable() { //setup new thread
+                            public void run() {
+                                Message msg = handler.obtainMessage(); //send toast to handler
+                                Bundle bundle = new Bundle();
+                                bundle.putString("toastMessage", getString(R.string.toast1));
+                                bundle.putBoolean("endTurn", false);
+                                msg.setData(bundle);
+                                handler.sendMessage(msg);
+                                game.setCurrentBoard(Ai.minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 6), false, highlighted); //run minimax algorithm in new thread
+                                msg = handler.obtainMessage(); //send toast to handler
+                                bundle = new Bundle();
+                                bundle.putString("toastMessage", getString(R.string.toast2));
+                                bundle.putBoolean("endTurn", true);
+                                msg.setData(bundle);
+                                handler.sendMessage(msg);
+                            }
+                        };
+                        Thread myThread = new Thread(runnable); //run thread
+                        myThread.start();
+                    }
                 }
             }
         }
@@ -179,7 +242,7 @@ public class GameActivity extends AppCompatActivity {
     private int touchToBit(int x, int y){
         //find square number in x and y
         int squareLeftEdge = square0width;
-        int squareBottomEdge = square0height + 3*squareSize;
+        int squareBottomEdge = (int) (square0height + 1.6*squareSize);
         int squareNumX = -1;
         int squareNumY = -1;
 
@@ -298,15 +361,13 @@ public class GameActivity extends AppCompatActivity {
         return null;
     }
 
-    //creates ImageViews for counter positions using Game's currentBoard and screen dimensions
-    private void updateCounterViews(){
+    //adds ImageViews into layout for counter positions using Game's currentBoard and screen dimensions
+    private void addCounterViews(){
 
         int counterIndex = 0;
         int drawableId;
-        counterViews = new ImageView[24];
 
         for (int positionIndex = 0; positionIndex <= 40; positionIndex++) { //for each position
-
             //decide on image for counter
             if (positionIndex == highlighted && (game.getCurrentBoard().isBlack(positionIndex) || game.getCurrentBoard().isWhite(positionIndex))){
                 if (game.getCurrentBoard().isKing(positionIndex)) {
@@ -330,46 +391,44 @@ public class GameActivity extends AppCompatActivity {
                 continue; //if not black or white, continue loop
             }
 
-            //create counter, assign ID & drawable
+            //setup counter using ID & drawable
             ImageView counter = new ImageView(this);
             counter.setId(counterIds[counterIndex]);
             counter.setImageResource(drawableId);
-
             RelativeLayout.LayoutParams counterParams = new RelativeLayout.LayoutParams(
                     squareSize,
-                    squareSize
-            );
-
+                    squareSize);
             counterParams.leftMargin = coordinates[positionIndex][0]; //margins are fetched from coordinates array
             counterParams.topMargin = coordinates[positionIndex][1];
-
             counter.setLayoutParams(counterParams);
-            counterViews[counterIndex] = counter;
+
+            layout.addView(counter);
             counterIndex++;
 
         }
 
     }
 
-    //displays counters in counterViews onto the screen
-    private void displayGame(){
-        //remove old counters from layout
-        for (ImageView counter : counterViews){
+    //removes all views from layout, excluding gameboard and player labels
+    private void removeViews(){
+        //remove counters from layout
+        for (int id : counterIds){
+            ImageView counter = (ImageView) findViewById(id);
             if (counter == null){
                 break;
             }
             ((ViewGroup) counter.getParent()).removeView(counter);
         }
 
-        //add in new counters
-        updateCounterViews();
-        for (ImageView counter : counterViews){
-            if (counter == null){
-                break;
-            }
-            layout.addView(counter);
-        }
-        setContentView(layout);
+        //remove turnLabel from layout
+        try{
+            ((ViewGroup) turnLabel.getParent()).removeView(turnLabel);
+        } catch (Exception e){}
+
+        //remove gameOverMessage from layout
+        try{
+            ((ViewGroup) gameOverMessage.getParent()).removeView(gameOverMessage);
+        } catch (Exception e){}
     }
 
 }

@@ -9,11 +9,7 @@ package com.example.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
-import android.content.Context;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-
-public class Game {
+class Game {
 
     private Board currentBoard; //current board being displayed
     private Board[] legalMoves; //array of legal moves available
@@ -21,22 +17,22 @@ public class Game {
     //boolean variables for details of the game
     private boolean againstComputer; //is it against AI or 2 player
     private boolean player1Black; //is player 1 black
-    public boolean player1Turn; //is it player 1's turn
+    private boolean player1Turn; //is it player 1's turn
 
     //getters for all of those
-    public Board getCurrentBoard() {
+    Board getCurrentBoard() {
         return currentBoard;
     }
-    public Board[] getLegalMoves(){
+    Board[] getLegalMoves(){
         return legalMoves;
     }
-    public boolean isAgainstComputer() {
+    boolean isAgainstComputer() {
         return againstComputer;
     }
-    public boolean isPlayer1Black() {
+    boolean isPlayer1Black() {
         return player1Black;
     }
-    public boolean isPlayer1Turn() {
+    boolean isPlayer1Turn() {
         return player1Turn;
     }
 
@@ -52,7 +48,7 @@ public class Game {
     }
 
     //update currentBoard, and start new thread for AI to make a move if necessary
-    public void setCurrentBoard(Board newBoard, Boolean onlyMultiJump, int highlighted){
+    void setCurrentBoard(Board newBoard, Boolean onlyMultiJump, int highlighted){
         currentBoard = newBoard;
         if (!onlyMultiJump){
             player1Turn = !player1Turn;

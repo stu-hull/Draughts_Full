@@ -14,8 +14,16 @@
 
     <string name="gameboard_desc">The gameboard</string>
 
+    <string name="player1Move">Player 1 to move</string>
+    <string name="player2Move">Player 2 to move</string>
+
     <string name="toast1">Computer is thinking…</string>
     <string name="toast2">It\'s your move!</string>
+
+    <string name="youLost">You Lost!</string>
+    <string name="youWon">You Won!</string>
+    <string name="player1Won">Player 1 Won!</string>
+    <string name="player2Won">Player 2 Won!</string>
 
 
 </resources>

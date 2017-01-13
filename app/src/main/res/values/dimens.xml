@@ -5,4 +5,6 @@
     <dimen name="board_size">300dp</dimen>
     <dimen name="square_size">35dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="gameOverMessageSize">50dp</dimen>
+    <dimen name="turnLabelTextSize">30dp</dimen>
 </resources>

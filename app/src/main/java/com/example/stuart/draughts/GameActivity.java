@@ -24,6 +24,8 @@ public class GameActivity extends AppCompatActivity {
     int squareSize;
     int[][] coordinates;
 
+    Boolean inGame = true;
+
     ImageView[] counterViews = new ImageView[24];
     int highlighted;
     Boolean onlyMultiJump = false;
@@ -59,9 +61,9 @@ public class GameActivity extends AppCompatActivity {
         //find dimensions dynamically
         DisplayMetrics metrics = getResources().getDisplayMetrics(); //metrics holds information about the display
         boardSize = (int)(metrics.widthPixels - 50*metrics.density); //size is width of screen minus 50dp (dp is converted to px by multiplying by density)
-        square0width = ((metrics.widthPixels - boardSize)/2); //first column from the left
-        square0height = ((metrics.heightPixels + boardSize/2)/2); //first row up from bottom
         squareSize = (boardSize/8);
+        square0width = ((metrics.widthPixels - boardSize)/2); //first column from the left
+        square0height = (int) (((0.82*metrics.heightPixels + boardSize)/2));// - 1.35*squareSize); //first row up from bottom
 
         //Set up relativelayout
         layout = new RelativeLayout(this);
@@ -138,7 +140,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (game.isPlayer1Turn() || !(game.isAgainstComputer())) { //if it's a human's turn, the user needs to input
+            if (inGame && (game.isPlayer1Turn() || !(game.isAgainstComputer()))) { //if it's a human's turn, the user needs to input
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
                 Board newBoard = userInput(bit); //pass on input to userInput to deal with
                 if (newBoard != null){ //if board returned, change currentBoard
@@ -167,6 +169,39 @@ public class GameActivity extends AppCompatActivity {
                     Thread myThread = new Thread(runnable); //run thread
                     myThread.start();
                 }
+                if (game.getLegalMoves().length == 0){
+                    for (ImageView counter : counterViews){ //remove counters from screen
+                        if (counter == null){
+                            break;
+                        }
+                        ((ViewGroup) counter.getParent()).removeView(counter);
+                    }
+                    TextView gameOverMessage = new TextView(this);
+                    gameOverMessage.setId(R.id.gameOverMessage);
+                    if (game.isAgainstComputer() && game.isPlayer1Turn()){ //if player lost against computer
+                        gameOverMessage.setText(R.string.youLost);
+                        gameOverMessage.setTextColor(getResources().getColor(R.color.loseColour));
+                    } else {
+                        gameOverMessage.setTextColor(getResources().getColor(R.color.winColour));
+                        if (game.isAgainstComputer() && !(game.isPlayer1Turn())){ //if player 1 won against computer
+                            gameOverMessage.setText(R.string.youWon);
+                        } else if (game.isPlayer1Turn()){ //if player 2 won against human
+                            gameOverMessage.setText(R.string.player2Won);
+                        } else { //else player 1 won
+                            gameOverMessage.setText(R.string.player1Won);
+                        }
+                    }
+                    gameOverMessage.setTextSize(50);
+                    RelativeLayout.LayoutParams gameOverMessageParams = new RelativeLayout.LayoutParams(
+                            RelativeLayout.LayoutParams.WRAP_CONTENT,
+                            RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    gameOverMessageParams.addRule(RelativeLayout.CENTER_VERTICAL);
+                    gameOverMessageParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    layout.addView(gameOverMessage);
+
+                    setContentView(layout);
+                }
+
             }
         }
 
@@ -177,7 +212,7 @@ public class GameActivity extends AppCompatActivity {
     private int touchToBit(int x, int y){
         //find square number in x and y
         int squareLeftEdge = square0width;
-        int squareBottomEdge = square0height + 3*squareSize;
+        int squareBottomEdge = (int) (square0height + 1.6*squareSize);
         int squareNumX = -1;
         int squareNumY = -1;
 

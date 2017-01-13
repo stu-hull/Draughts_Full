@@ -31,4 +31,6 @@
     <item name="counter21" type="id"/>
     <item name="counter22" type="id"/>
     <item name="counter23" type="id"/>
+
+    <item name="gameOverMessage" type="id"/>
 </resources>

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,7 +34,9 @@ public class GameActivity extends AppCompatActivity {
             R.id.counter18, R.id.counter19, R.id.counter20, R.id.counter21, R.id.counter22, R.id.counter23
     };
     TextView gameOverMessage;
-    TextView turnLabel;
+    TextView player1Label;
+    TextView player2Label;
+    Button undoButton;
 
     int highlighted;
     Boolean inGame = true;
@@ -52,12 +55,10 @@ public class GameActivity extends AppCompatActivity {
             if (endTurn){
                 removeViews();
                 addCounterViews(); //add in counters
-                turnLabel.setText(R.string.player1Move); //update turnLabel
-                RelativeLayout.LayoutParams turnLabelParams = (RelativeLayout.LayoutParams) turnLabel.getLayoutParams();
-                turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-                turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                turnLabel.setLayoutParams(turnLabelParams);
-                layout.addView(turnLabel);
+                player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                player1Label.setTextSize(50);
+                player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                player2Label.setTextSize(30);
                 setContentView(layout);
             }
         }
@@ -105,10 +106,11 @@ public class GameActivity extends AppCompatActivity {
         layout.addView(gameBoard);
 
         //set up player 1 label
-        TextView player1Label = new TextView(this);
+        player1Label = new TextView(this);
         player1Label.setId(R.id.player1Label);
         player1Label.setText(R.string.player1);
-        player1Label.setTextSize(30);
+        player1Label.setTextSize(50);
+        player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
         RelativeLayout.LayoutParams player1LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -118,10 +120,11 @@ public class GameActivity extends AppCompatActivity {
         layout.addView(player1Label);
 
         //set up player 2 label
-        TextView player2Label = new TextView(this);
+        player2Label = new TextView(this);
         player2Label.setId(R.id.player2Label);
         player2Label.setText(R.string.player2);
         player2Label.setTextSize(30);
+        player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
         RelativeLayout.LayoutParams player2LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -130,17 +133,9 @@ public class GameActivity extends AppCompatActivity {
         player2Label.setLayoutParams(player2LabelParams);
         layout.addView(player2Label);
 
-        //set up turn label which indicates whose turn it is
-        turnLabel = new TextView(this);
-        turnLabel.setTextSize(30);
-        turnLabel.setText(R.string.player1Move);
-        RelativeLayout.LayoutParams turnLabelParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
-        turnLabelParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        turnLabel.setLayoutParams(turnLabelParams);
-        layout.addView(turnLabel);
+        //set up undo button
+        undoButton = new Button(this);
+        undoButton.setTextSize(20);
 
         //set up game over message
         gameOverMessage = new TextView(this);
@@ -206,19 +201,16 @@ public class GameActivity extends AppCompatActivity {
 
                     addCounterViews(); //add in counters
                     if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
-                        turnLabel.setText(R.string.player1Move);
-                        RelativeLayout.LayoutParams turnLabelParams = (RelativeLayout.LayoutParams) turnLabel.getLayoutParams();
-                        turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-                        turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                        turnLabel.setLayoutParams(turnLabelParams);
+                        player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                        player1Label.setTextSize(50);
+                        player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                        player2Label.setTextSize(30);
                     } else {
-                        turnLabel.setText(R.string.player2Move);
-                        RelativeLayout.LayoutParams turnLabelParams = (RelativeLayout.LayoutParams) turnLabel.getLayoutParams();
-                        turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-                        turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                        turnLabel.setLayoutParams(turnLabelParams);
+                        player2Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                        player2Label.setTextSize(50);
+                        player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                        player1Label.setTextSize(30);
                     }
-                    layout.addView(turnLabel);
                     setContentView(layout);
 
                     //if computer's turn, run AI in new thread
@@ -402,14 +394,13 @@ public class GameActivity extends AppCompatActivity {
             ((ViewGroup) counter.getParent()).removeView(counter);
         }
 
-        //remove turnLabel from layout
-        try{
-            ((ViewGroup) turnLabel.getParent()).removeView(turnLabel);
-        } catch (java.lang.NullPointerException e){} //except if not already in layout
-
         //remove gameOverMessage from layout
         try{
             ((ViewGroup) gameOverMessage.getParent()).removeView(gameOverMessage);
+        } catch (java.lang.NullPointerException e){} //except if not already in layout
+
+        try{
+            ((ViewGroup) undoButton.getParent()).removeView(undoButton);
         } catch (java.lang.NullPointerException e){} //except if not already in layout
     }
 

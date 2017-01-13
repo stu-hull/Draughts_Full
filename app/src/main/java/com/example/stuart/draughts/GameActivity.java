@@ -136,7 +136,7 @@ public class GameActivity extends AppCompatActivity {
         System.out.println("DONE");
     }
 
-    //onTouchEvent manages screen touch and updates game as necessary (runs AI in separate thread)
+    //onTouchEvent manages screen touch and updates game as necessary, initialises new thread to run AI in
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -170,6 +170,7 @@ public class GameActivity extends AppCompatActivity {
                     myThread.start();
                 }
                 if (game.getLegalMoves().length == 0){
+                    inGame = false;
                     for (ImageView counter : counterViews){ //remove counters from screen
                         if (counter == null){
                             break;
@@ -195,13 +196,15 @@ public class GameActivity extends AppCompatActivity {
                     RelativeLayout.LayoutParams gameOverMessageParams = new RelativeLayout.LayoutParams(
                             RelativeLayout.LayoutParams.WRAP_CONTENT,
                             RelativeLayout.LayoutParams.WRAP_CONTENT);
-                    gameOverMessageParams.addRule(RelativeLayout.CENTER_VERTICAL);
                     gameOverMessageParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    layout.addView(gameOverMessage);
+                    gameOverMessageParams.addRule(RelativeLayout.CENTER_VERTICAL);
+                    layout.addView(gameOverMessage, gameOverMessageParams);
 
                     setContentView(layout);
                 }
 
+            } else if (!inGame){ //else if the game has ended, return to main menu upon touch
+                finish();
             }
         }
 

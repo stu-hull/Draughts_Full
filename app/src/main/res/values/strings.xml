@@ -11,6 +11,7 @@
 
     <string name="player2">Player 2</string>
     <string name="player1">Player 1</string>
+    <string name="undoButton">Undo</string>
 
     <string name="gameboard_desc">The gameboard</string>
 

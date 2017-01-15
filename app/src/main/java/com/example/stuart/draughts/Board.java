@@ -5,31 +5,7 @@ package com.example.stuart.draughts;
  * A board representation, holding a board state using bitboards and small functions to query the board
  * NOTE: this board representation is limited to the rules; it cannot be freely edited and moves must be in accordance with the rules
  */
-public class Board {
-
-    //test method
-    public static void main(String[] args){
-        Board testBoard = new Board();
-        testBoard.realBoard();
-        System.out.println(Long.toBinaryString(testBoard.blackPieces));
-        System.out.println(Long.toBinaryString(testBoard.whitePieces));
-        System.out.println(Long.toBinaryString(testBoard.kings));
-
-        Board[] allMoves = testBoard.findMoves(true);
-        for (Board move : allMoves){
-            System.out.println("");
-            System.out.println(Long.toBinaryString(move.getBlackPieces()));
-            System.out.println(Long.toBinaryString(move.getWhitePieces()));
-            System.out.println(Long.toBinaryString(move.getKings()));
-        }
-
-    }
-
-    void realBoard(){
-        blackPieces = 0b0000010110000000010011000000000000000000000000L;
-        whitePieces = 0b0000001000000010000100010000001001110001100000L;
-        kings       = 0b0000001000000000000000000000000000000000000000L;
-    } //sets up a realistic board scenario for testing
+class Board {
 
     /*
     board layout:
@@ -51,11 +27,7 @@ public class Board {
 
     //takes an integer board position, and creates a mask for that position
     private static long findMask(int position){
-        long result = 1;
-        for (int i=0; i<(45-position); i++){ //raises 2 to the power of (45-position), no easier way to do this in java (Math.pow is an approximation)
-            result *= 2;
-        }
-        return result;
+        return 1L<<(long)(45-position);
     } //DONE //TESTED
 
     //takes an integer board position and finds whether that board position is valid
@@ -100,7 +72,7 @@ public class Board {
         whitePieces = 0b0000000000000000000000000000000000000000000000L;
         kings =       0b0000000000000000000000000000000000000000000000L;
     } //sets up a board with no pieces on, the players return this as their best move if they cannot play
-    private void copyBoard(Board original){
+    public void copyBoard(Board original){
         blackPieces = original.getBlackPieces();
         whitePieces = original.getWhitePieces();
         kings = original.getKings();
@@ -223,11 +195,11 @@ public class Board {
                     Board afterJump = this.makeSimpleMove(position, position+8); //make the jump
                     if (!(afterJump.isKing(position+8)) && position >= 28){ //if piece is a man and on back row
                         afterJump.kings += 1L<<(long)(45-(position+8)); //make piece a king
-                        System.arraycopy(new Board[]{afterJump}, 0, totalMoves, totalMoveCount, 1);
+                        totalMoves[totalMoveCount] = afterJump;
                         totalMoveCount ++;
                     } else { //only check for multijumps if didnt become a king
                         furtherMoves = afterJump.findMultiJump(position + 8); //check for all further moves from that position
-                        totalMoves[totalMoveCount] = afterJump;
+                        System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
                         totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                     }
                 }
@@ -235,11 +207,11 @@ public class Board {
                     Board afterJump = this.makeSimpleMove(position, position+10); //make the jump
                     if (!(afterJump.isKing(position+10)) && position >= 28){ //if piece is a man and on back row
                         afterJump.kings += 1L<<(long)(45-(position+10)); //make piece a king
-                        System.arraycopy(new Board[]{afterJump}, 0, totalMoves, totalMoveCount, 1);
+                        totalMoves[totalMoveCount] = afterJump;
                         totalMoveCount ++;
                     } else { //only check for multijumps if didnt become a king
                         furtherMoves = afterJump.findMultiJump(position + 10); //check for all further moves from that position
-                        totalMoves[totalMoveCount] = afterJump;
+                        System.arraycopy(furtherMoves, 0, totalMoves, totalMoveCount, furtherMoves.length); //add moves to total
                         totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                     }
                 }

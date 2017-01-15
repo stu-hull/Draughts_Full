@@ -9,21 +9,38 @@ package com.example.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
-class Game {
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+class Game{
 
     private Board currentBoard; //current board being displayed
     private Board[] legalMoves; //array of legal moves available
+    public Boolean inMultiJump = false;
+    private Board temporaryBoard;
+    private Board[] temporaryLegalMoves;
 
     //boolean variables for details of the game
     private boolean againstComputer; //is it against AI or 2 player
     private boolean player1Black; //is player 1 black
     private boolean player1Turn; //is it player 1's turn
 
+    private Game previousGameState; //previous game state to undo from
+
     //getters for all of those
     Board getCurrentBoard() {
+        if (inMultiJump){
+            return temporaryBoard;
+        }
         return currentBoard;
     }
     Board[] getLegalMoves(){
+        if (inMultiJump){
+            return temporaryLegalMoves;
+        }
         return legalMoves;
     }
     boolean isAgainstComputer() {
@@ -34,6 +51,12 @@ class Game {
     }
     boolean isPlayer1Turn() {
         return player1Turn;
+    }
+    Game getPreviousGameState() {
+        return previousGameState;
+    }
+    Boolean getInMultiJump(){
+        return inMultiJump;
     }
 
     //constructor sets up initial details of the game and displays them
@@ -47,15 +70,29 @@ class Game {
         player1Turn = player1Black;
     }
 
-    //update currentBoard, and start new thread for AI to make a move if necessary
-    void setCurrentBoard(Board newBoard, Boolean onlyMultiJump, int highlighted){
-        currentBoard = newBoard;
-        if (!onlyMultiJump){
+    //update currentBoard
+    void setCurrentBoard(Board newBoard, int highlighted){
+        if (inMultiJump){
+            temporaryBoard = newBoard;
+            temporaryLegalMoves = temporaryBoard.findMultiJump(highlighted);
+        } else {
+            currentBoard = newBoard;
             player1Turn = !player1Turn;
             legalMoves = currentBoard.findMoves(player1Turn == player1Black);
-        } else {
-            legalMoves = currentBoard.findMultiJump(highlighted);
         }
+    }
+
+    //save current game state to undo to
+    public void saveGame(){
+        System.out.println("Saving game...");
+        previousGameState = new Game(againstComputer, true); //copy game into previousGameState
+        previousGameState.currentBoard.copyBoard(this.currentBoard); //copyBoard acts as a deepcopy for Board objects
+        previousGameState.legalMoves = new Board[this.legalMoves.length];
+        for (int i=0; i < this.legalMoves.length; i++){ //Iterate through legalMoves, copyBoarding each into previousGameState
+            previousGameState.legalMoves[i] = new Board();
+            previousGameState.legalMoves[i].copyBoard(this.legalMoves[i]);
+        }
+        previousGameState.player1Turn = this.player1Turn;
     }
 
 

@@ -2,11 +2,14 @@ package com.example.stuart.draughts;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,7 +28,6 @@ public class GameActivity extends AppCompatActivity {
     int[][] coordinates;
 
     //Views for different parts of the layout
-    ImageView[] counterViews = new ImageView[24];
     static int[] counterIds = new int[]{ //array of every id to assign each counter
             R.id.counter0, R.id.counter1, R.id.counter2, R.id.counter3, R.id.counter4, R.id.counter5,
             R.id.counter6, R.id.counter7, R.id.counter8, R.id.counter9, R.id.counter10, R.id.counter11,
@@ -33,11 +35,12 @@ public class GameActivity extends AppCompatActivity {
             R.id.counter18, R.id.counter19, R.id.counter20, R.id.counter21, R.id.counter22, R.id.counter23
     };
     TextView gameOverMessage;
-    TextView turnLabel;
+    TextView player1Label;
+    TextView player2Label;
+    Button undoButton;
 
     int highlighted;
     Boolean inGame = true;
-    Boolean onlyMultiJump = false;
 
     //handler sends a toast message to the screen
     Handler handler = new Handler(){
@@ -52,9 +55,38 @@ public class GameActivity extends AppCompatActivity {
             if (endTurn){
                 removeViews();
                 addCounterViews(); //add in counters
-                turnLabel.setText(R.string.player1Move);
-                layout.addView(turnLabel);
+                player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                player1Label.setTextSize(50);
+                player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                player2Label.setTextSize(30);
                 setContentView(layout);
+            }
+        }
+    };
+
+    View.OnClickListener undoMove = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            System.out.println("Point 1");
+            if (game.getPreviousGameState() != null && !game.inMultiJump){ //if there's a previous gamestate, ie not just undoed and not right at the start, and not in middle of multijump
+                System.out.println("Point 2");
+                game = game.getPreviousGameState();
+                highlighted = -1;
+                removeViews();
+                addCounterViews();
+                if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
+                    player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                    player1Label.setTextSize(50);
+                    player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                    player2Label.setTextSize(30);
+                } else {
+                    player2Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                    player2Label.setTextSize(50);
+                    player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                    player1Label.setTextSize(30);
+                }
+                setContentView(layout);
+                System.out.println("Point 3");
             }
         }
     };
@@ -101,10 +133,11 @@ public class GameActivity extends AppCompatActivity {
         layout.addView(gameBoard);
 
         //set up player 1 label
-        TextView player1Label = new TextView(this);
+        player1Label = new TextView(this);
         player1Label.setId(R.id.player1Label);
         player1Label.setText(R.string.player1);
-        player1Label.setTextSize(30);
+        player1Label.setTextSize(50);
+        player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
         RelativeLayout.LayoutParams player1LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -114,10 +147,11 @@ public class GameActivity extends AppCompatActivity {
         layout.addView(player1Label);
 
         //set up player 2 label
-        TextView player2Label = new TextView(this);
+        player2Label = new TextView(this);
         player2Label.setId(R.id.player2Label);
         player2Label.setText(R.string.player2);
         player2Label.setTextSize(30);
+        player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
         RelativeLayout.LayoutParams player2LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -126,17 +160,18 @@ public class GameActivity extends AppCompatActivity {
         player2Label.setLayoutParams(player2LabelParams);
         layout.addView(player2Label);
 
-        //set up turn label which indicates whose turn it is
-        turnLabel = new TextView(this);
-        turnLabel.setTextSize(30);
-        turnLabel.setText(R.string.player1Move);
-        RelativeLayout.LayoutParams turnLabelParams = new RelativeLayout.LayoutParams(
+        //set up undo button
+        undoButton = new Button(this);
+        undoButton.setText(R.string.undoButton);
+        undoButton.setTextSize(20);
+        undoButton.setOnClickListener(undoMove);
+        RelativeLayout.LayoutParams undoButtonParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
-        turnLabelParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        turnLabelParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        turnLabel.setLayoutParams(turnLabelParams);
-        layout.addView(turnLabel);
+        undoButtonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        undoButtonParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        undoButton.setLayoutParams(undoButtonParams);
+        layout.addView(undoButton);
 
         //set up game over message
         gameOverMessage = new TextView(this);
@@ -161,16 +196,15 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (!inGame) { //else if the game has ended, return to main menu upon touch
+            if (!inGame) { //if the game has ended, return to main menu upon touch
                 finish();
 
-            } else if (game.isPlayer1Turn() || !game.isAgainstComputer()) { //if it's a human's turn, the user needs to input
-
+            } else if (game.isPlayer1Turn() || !game.isAgainstComputer()) { //else if it's a human's turn, the user needs to input
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
                 Board newBoard = userInput(bit); //pass on input to userInput to deal with
 
                 if (newBoard != null) { //if board returned, change currentBoard
-                    game.setCurrentBoard(newBoard, onlyMultiJump, highlighted);
+                    game.setCurrentBoard(newBoard, highlighted);
                 }
 
                 removeViews(); //clear views
@@ -199,12 +233,17 @@ public class GameActivity extends AppCompatActivity {
                 } else { //else game still in play
 
                     addCounterViews(); //add in counters
-                    if (game.isPlayer1Turn()) { //set message of turnLabel
-                        turnLabel.setText(R.string.player1Move);
+                    if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
+                        player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                        player1Label.setTextSize(50);
+                        player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                        player2Label.setTextSize(30);
                     } else {
-                        turnLabel.setText(R.string.player2Move);
+                        player2Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                        player2Label.setTextSize(50);
+                        player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                        player1Label.setTextSize(30);
                     }
-                    layout.addView(turnLabel);
                     setContentView(layout);
 
                     //if computer's turn, run AI in new thread
@@ -217,7 +256,7 @@ public class GameActivity extends AppCompatActivity {
                                 bundle.putBoolean("endTurn", false);
                                 msg.setData(bundle);
                                 handler.sendMessage(msg);
-                                game.setCurrentBoard(Ai.minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 6), false, highlighted); //run minimax algorithm in new thread
+                                game.setCurrentBoard(Ai.minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 7), highlighted); //run minimax algorithm in new thread
                                 msg = handler.obtainMessage(); //send toast to handler
                                 bundle = new Bundle();
                                 bundle.putString("toastMessage", getString(R.string.toast2));
@@ -271,88 +310,60 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    //figures out what to display to the user from their touch location. The function also returns a Board if the board is to be updated.
+    //figures out what to display to the user from their touch location. The function also saves the current game state and returns a Board if the board is to be updated.
+    @Nullable
     private Board userInput(int bit){
-        System.out.println(game.getLegalMoves().length);
         if (game.isAgainstComputer() && !(game.isPlayer1Turn())){
             throw new IllegalStateException("userInput called when no user input is required");
         }
         if (highlighted == -1){ //if nothing highlighted
-            System.out.println("1 Nothing already highlighted");
             if (!(game.getCurrentBoard().isEmpty(bit)) && (game.getCurrentBoard().isBlack(bit) == (game.isPlayer1Black() == game.isPlayer1Turn()))){ //if tapped on counter and counter is right colour, highlight counter
                 highlighted = bit;
-                System.out.println("1.1 Counter highlighted");
             }
         } else {
-            System.out.println("2 Something already highlighted");
             if (game.getCurrentBoard().isEmpty(bit)) { //if tapped on empty space
-                System.out.println("2.1 Tapped on clear space");
                 Board newBoard = game.getCurrentBoard().makeSimpleMove(highlighted, bit); //make move on new board
-                System.out.println(game.isPlayer1Turn());
                 Boolean legal = false;
                 for (Board move : game.getLegalMoves()) { //test if legal
-                    /*System.out.println(Long.toBinaryString(newBoard.getBlackPieces()));
-                    System.out.println(Long.toBinaryString(newBoard.getKings()));
-                    System.out.println(Long.toBinaryString(newBoard.getWhitePieces()));
-                    System.out.println(Long.toBinaryString(move.getBlackPieces()));
-                    System.out.println(Long.toBinaryString(move.getKings()));
-                    System.out.println(Long.toBinaryString(move.getWhitePieces()));*/
                     if (move.getBlackPieces() == newBoard.getBlackPieces() && move.getWhitePieces() == newBoard.getWhitePieces() && move.getKings() == newBoard.getKings()) {
                         legal = true;
                         break;
                     }
                 }
                 if (legal) {
-                    System.out.println("2.1.1 Move requested is legal");
                     if ((highlighted - bit) * (highlighted - bit) <= 25) { //if a slide was made rather than a jump, make move and reset (unless in multijump, in which case do nothing)
-                        System.out.println("2.1.1.1 Move requested is a slide");
-                        if (!(onlyMultiJump)) {
-                            System.out.println("2.1.1.1.1 Not in multijump- confirm move, reset, unhighlight");
-                            //currentBoard = newBoard;
+                        if (!(game.inMultiJump)) {
                             highlighted = -1;
-                            //player1Turn = !player1Turn;
-                            //legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
+                            game.saveGame();
                             return newBoard;
                         }
                     } else {
-                        System.out.println("2.1.1.2 Move requested is a jump");
                         Board[] newNewBoards = newBoard.findMultiJump(bit); //find all further possible jumps
                         if (newNewBoards.length > 1) { //if more jumps available, make move, keep piece highlighted, and record that only multi jumps allowed
-                            System.out.println("2.1.1.2.1 Move has further jump options- onlymultijump enabled, piece moved and highlighted");
-                            //currentBoard = newBoard;
-                            //legalMoves = currentBoard.findMultiJump(bit); //only legal moves are the multi jump ones
                             highlighted = bit;
-                            onlyMultiJump = true;
+                            game.inMultiJump = true;
                             return newBoard;
                         } else { //if no further jumps, make move, change player to nextPlayer and reset
-                            System.out.println("2.1.1.2.2 Move has no further jumps- confirm move, reset and unhighlight");
-                            //currentBoard = newBoard;
                             highlighted = -1;
-                            //player1Turn = !player1Turn;
-                            onlyMultiJump = false;
-                            //legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
+                            game.inMultiJump = false;
+                            game.saveGame();
                             return newBoard;
                         }
                     }
                 } else {
-                    System.out.println("2.1.2 Move requested is illegal");
-                    if (!onlyMultiJump) {
-                        System.out.println("2.1.2.1 Not in multijump- unhighlight");
+                    if (!game.inMultiJump) {
                         highlighted = -1; //if illegal, reset (ignore if in multijump)
                     }
                 }
-            } else if (onlyMultiJump){
-                System.out.println("2.2 Tapped on counter but in multijump");
+            } else if (game.inMultiJump){
                 if (bit == highlighted) { //if doing a multijump and the player taps the piece, stop the jump and end the turn (if they tap another piece, ignore
-                    System.out.println("2.2.1 Tapped on highlighted counter, stop jump");
                     highlighted = -1;
-                    //player1Turn = !player1Turn;
-                    onlyMultiJump = false;
-                    //legalMoves = currentBoard.findMoves(isPlayer1Black() == player1Turn); //current colour to move is dependent on whether player 1 is black and whose turn it is
-                    return game.getCurrentBoard();
+                    Board toReturn = game.getCurrentBoard();
+                    game.inMultiJump = false;
+                    game.saveGame();
+                    return toReturn;
                 }
             } else {
-                System.out.println("2.3 Tapped on counter, unhighlight");
                 highlighted = -1; //else reset
             }
         }
@@ -407,7 +418,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    //removes all views from layout, excluding gameboard and player labels
+    //removes all views from layout, excluding gameboard, player labels
     private void removeViews(){
         //remove counters from layout
         for (int id : counterIds){
@@ -417,16 +428,16 @@ public class GameActivity extends AppCompatActivity {
             }
             ((ViewGroup) counter.getParent()).removeView(counter);
         }
-
-        //remove turnLabel from layout
-        try{
-            ((ViewGroup) turnLabel.getParent()).removeView(turnLabel);
-        } catch (Exception e){}
-
+        /*
         //remove gameOverMessage from layout
         try{
             ((ViewGroup) gameOverMessage.getParent()).removeView(gameOverMessage);
-        } catch (Exception e){}
+        } catch (java.lang.NullPointerException e){} //except if not already in layout
+
+        try{
+            ((ViewGroup) undoButton.getParent()).removeView(undoButton);
+        } catch (java.lang.NullPointerException e){} //except if not already in layout
+        */
     }
 
 }

@@ -5,9 +5,13 @@
     <string name="title">Draughts</string>
 
     <string name="new_game">New Game</string>
+
     <string name="computer_toggle">Computer Opponent</string>
     <string name="computer_on">on</string>
     <string name="computer_off">off</string>
+    <string name="player1ColourLabel">Player 1 Color</string>
+    <string name="player2ColourLabel">Player 2 Color</string>
+    <string name="playerWhite">White</string>
 
     <string name="player2">Player 2</string>
     <string name="player1">Player 1</string>
@@ -25,6 +29,8 @@
     <string name="youWon">You Won!</string>
     <string name="player1Won">Player 1 Won!</string>
     <string name="player2Won">Player 2 Won!</string>
+    <string name="playerRed">Red</string>
+    <string name="playerBlack">Black</string>
 
 
 </resources>

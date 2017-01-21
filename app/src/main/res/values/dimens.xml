@@ -3,6 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="gameOverMessageSize">50dp</dimen>
-    <dimen name="turnLabelTextSize">30dp</dimen>
+    <dimen name="turnLabelTextSize">30sp</dimen>
+    <dimen name="playerColourLabelSize">15sp</dimen>
 </resources>

@@ -9,17 +9,11 @@ package com.example.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
 class Game{
 
     private Board currentBoard; //current board being displayed
     private Board[] legalMoves; //array of legal moves available
-    public Boolean inMultiJump = false;
+    Boolean inMultiJump = false;
     private Board temporaryBoard;
     private Board[] temporaryLegalMoves;
 
@@ -55,9 +49,6 @@ class Game{
     Game getPreviousGameState() {
         return previousGameState;
     }
-    Boolean getInMultiJump(){
-        return inMultiJump;
-    }
 
     //constructor sets up initial details of the game and displays them
     Game( boolean againstComputer, boolean player1Black) {
@@ -83,7 +74,7 @@ class Game{
     }
 
     //save current game state to undo to
-    public void saveGame(){
+    void saveGame(){
         System.out.println("Saving game...");
         previousGameState = new Game(againstComputer, true); //copy game into previousGameState
         previousGameState.currentBoard.copyBoard(this.currentBoard); //copyBoard acts as a deepcopy for Board objects

@@ -11,8 +11,8 @@
         <activity
             android:name=".MainMenu"
             android:label="@string/title_activity_main_menu"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,6 +21,10 @@
         </activity>
         <activity
             android:name=".GameActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".Settings"
             android:screenOrientation="portrait">
         </activity>
     </application>

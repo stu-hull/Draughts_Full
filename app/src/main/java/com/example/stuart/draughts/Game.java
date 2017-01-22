@@ -26,13 +26,13 @@ class Game{
 
     //getters for all of those
     Board getCurrentBoard() {
-        if (inMultiJump){
+        if (inMultiJump){ //if in multijump, move has not finished so return temporary board
             return temporaryBoard;
         }
         return currentBoard;
     }
     Board[] getLegalMoves(){
-        if (inMultiJump){
+        if (inMultiJump){ //if in multijump, only jumps available so return temporary legal moves
             return temporaryLegalMoves;
         }
         return legalMoves;

@@ -71,16 +71,16 @@ class Ai {
     //MAYBE use a genetic algorithm to optimise these values?
     private static double heuristicV1(Board board){
 
-        //the relative values of board positions and other figures
-        double baseValue = 100; //base value of every piece
-        double kingValue = 100; //kings are worth x more than base value
-        double backValue = 20; //pieces at the back are worth x more than base value
-        double centerValue = 0; //pieces in the center are worth x more than base value
-        double ratioConstant = 0; //changes the weight of a difference in piece count
+    //the relative values of board positions and other figures
+    double baseValue = 100; //base value of every piece
+    double kingValue = 100; //kings are worth x more than base value
+    double backValue = 20; //pieces at the back are worth x more than base value
+    double centerValue = 0; //pieces in the center are worth x more than base value
+    double ratioConstant = 0; //changes the weight of a difference in piece count
 
-        double score = 0;
+    double score = 0;
 
-        score += Long.bitCount(board.getBlackPieces()) * baseValue;
+score += Long.bitCount(board.getBlackPieces()) * baseValue;
         score -= Long.bitCount(board.getWhitePieces()) * baseValue;
 
         score += Long.bitCount(board.blackKings()) * kingValue;
@@ -93,12 +93,10 @@ class Ai {
         score -= board.whiteCount(Board.maskCenter) * centerValue;
 
         score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of black+constant : white+constant
-        score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant); 
+        score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
 
         return score;
 
-    } //DONE //TESTED
+        } //DONE //TESTED
 
 }
-
-//test change

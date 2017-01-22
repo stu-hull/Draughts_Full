@@ -22,10 +22,10 @@ public class MainMenu extends AppCompatActivity {
     //Runs when "Start Game" button on home screen is pressed- starts game activity, passes settings to activity
     public void startGame(View view) {
         Switch computerToggle = (Switch) findViewById(R.id.computer_toggle);
-        againstComputer = computerToggle.isChecked();
+        //againstComputer = computerToggle.isChecked();
 
         Intent intent = new Intent(MainMenu.this, GameActivity.class);
-        intent.putExtra("AGAINST_COMPUTER", againstComputer);
+        intent.putExtra("AGAINST_COMPUTER", false);
         intent.putExtra("PLAYER_1_BLACK", player1Black);
         startActivity(intent);
     }

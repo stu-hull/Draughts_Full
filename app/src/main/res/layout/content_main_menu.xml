@@ -35,4 +35,13 @@
         android:layout_marginTop="70dp"
         android:onClick="startGame"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings"
+        android:id="@+id/settings"
+        android:layout_below="@+id/new_game"
+        android:layout_centerHorizontal="true"
+        android:onClick="startSettings"/>
+
 </RelativeLayout>

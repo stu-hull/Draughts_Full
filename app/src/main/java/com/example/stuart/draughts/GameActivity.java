@@ -40,6 +40,11 @@ public class GameActivity extends AppCompatActivity {
     TextView player2Label;
     Button undoButton;
 
+    int player1ManID;
+    int player1KingID;
+    int player2ManID;
+    int player2KingID;
+
     int highlighted = -1;
     Boolean inGame = true;
 
@@ -56,9 +61,9 @@ public class GameActivity extends AppCompatActivity {
             if (endTurn){
                 removeViews();
                 addCounterViews(); //add in counters
-                player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                 player1Label.setTextSize(50);
-                player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
                 player2Label.setTextSize(30);
                 setContentView(layout);
             }
@@ -185,9 +190,48 @@ public class GameActivity extends AppCompatActivity {
         gameOverMessage.setLayoutParams(gameOverMessageParams);
 
         //set up game with passed in extras
-        game = new Game(getIntent().getBooleanExtra("AGAINST_COMPUTER", true), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
+        game = new Game(getIntent().getBooleanExtra("againstComputer", false), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
 
-        addCounterViews();
+        //set up counter images
+        int player1Colour = getIntent().getIntExtra("player1Colour", 1); //get player 1 colour code
+        switch (player1Colour){
+            case 0:
+                player1ManID = R.drawable.whiteman; //choose image based on colour code
+                player1KingID = R.drawable.whiteking;
+                break;
+            case 1:
+                player1ManID = R.drawable.redman;
+                player1KingID = R.drawable.redking;
+                break;
+            case 2:
+                player1ManID = R.drawable.blackman;
+                player1KingID = R.drawable.blackking;
+                break;
+            default:
+                player1ManID = R.drawable.redman;
+                player1KingID = R.drawable.redking;
+        }
+
+        int player2Colour = getIntent().getIntExtra("player2Colour", 0); //get player 1 colour code
+        switch (player2Colour){
+            case 0:
+                player2ManID = R.drawable.whiteman; //choose image based on colour code
+                player2KingID = R.drawable.whiteking;
+                break;
+            case 1:
+                player2ManID = R.drawable.redman;
+                player2KingID = R.drawable.redking;
+                break;
+            case 2:
+                player2ManID = R.drawable.blackman;
+                player2KingID = R.drawable.blackking;
+                break;
+            default:
+                player2ManID = R.drawable.whiteman;
+                player2KingID = R.drawable.whiteking;
+        }
+
+        addCounterViews(); //add counters to layout
 
         setContentView(layout); //display layout
         System.out.println("DONE");
@@ -218,9 +262,9 @@ public class GameActivity extends AppCompatActivity {
                     gameOverMessage.setId(R.id.gameOverMessage);
                     if (game.isAgainstComputer() && game.isPlayer1Turn()) { //if player lost against computer
                         gameOverMessage.setText(R.string.youLost);
-                        gameOverMessage.setTextColor(getResources().getColor(R.color.loseColour));
+                        gameOverMessage.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.loseColour));
                     } else {
-                        gameOverMessage.setTextColor(getResources().getColor(R.color.winColour));
+                        gameOverMessage.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.winColour));
                         if (game.isAgainstComputer() && !(game.isPlayer1Turn())) { //if player 1 won against computer
                             gameOverMessage.setText(R.string.youWon);
                         } else if (game.isPlayer1Turn()) { //if player 2 won against human
@@ -237,14 +281,14 @@ public class GameActivity extends AppCompatActivity {
 
                     addCounterViews(); //add in counters
                     if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
-                        player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                        player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                         player1Label.setTextSize(50);
-                        player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                        player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
                         player2Label.setTextSize(30);
                     } else {
-                        player2Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                        player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                         player2Label.setTextSize(50);
-                        player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                        player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
                         player1Label.setTextSize(30);
                     }
                     setContentView(layout);
@@ -390,15 +434,15 @@ public class GameActivity extends AppCompatActivity {
                 }
             } else if (game.getCurrentBoard().isPlayer1(positionIndex)){
                 if (game.getCurrentBoard().isKing(positionIndex)){
-                    drawableID = R.drawable.redking;
+                    drawableID = player1KingID;
                 } else {
-                    drawableID = R.drawable.redman;
+                    drawableID = player1ManID;
                 }
             } else if (game.getCurrentBoard().isPlayer2(positionIndex)) {
                 if (game.getCurrentBoard().isKing(positionIndex)){
-                    drawableID = R.drawable.whiteking;
+                    drawableID = player2KingID;
                 } else {
-                    drawableID = R.drawable.whiteman;
+                    drawableID = player2ManID;
                 }
             } else {
                 continue; //if not black or white, continue loop

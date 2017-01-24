@@ -99,17 +99,17 @@ class Board {
     } //empty squares (valid squares not black nor white)
 
     //methods to query the board
-    boolean isBlack(int position){
+    boolean isPlayer1(int position){
         return ((findMask(position) & blackPieces) != 0);
     } //returns true if a given position has a black piece
-    boolean isWhite(int position){
+    boolean isPlayer2(int position){
         return ((findMask(position) & whitePieces) != 0);
     } //returns true if a given position has a white piece
     boolean isKing(int position){
         return ((findMask(position) & kings) != 0);
     }  //returns true if a given position has a king
     boolean isEmpty(int position){
-        return (!(isBlack(position)) && !(isWhite(position)) && isValid(position));
+        return (!(isPlayer1(position)) && !(isPlayer2(position)) && isValid(position));
     } //returns true if a given position is valid but has no black or white pieces
     int blackCount(long mask){
         return Long.bitCount(blackPieces & mask);
@@ -130,7 +130,7 @@ class Board {
         //if gap between source and destination, remove piece in middle
         if ((source-destination)*(source-destination) > 25) {
             int captured = (source + destination) / 2;
-            if (isBlack(source)){
+            if (isPlayer1(source)){
                 afterMove.whitePieces -= findMask(captured);
             } else {
                 afterMove.blackPieces -= findMask(captured);
@@ -141,7 +141,7 @@ class Board {
         }
 
         //remove piece from source and replace at destination
-        if (isBlack(source)){
+        if (isPlayer1(source)){
             afterMove.blackPieces -= findMask(source);
             afterMove.blackPieces += findMask(destination);
             if (destination >= 37 && !(afterMove.isKing(source))){ //if at end and counter's not a king already, make a king
@@ -163,7 +163,7 @@ class Board {
     }  //...DONE //TESTED
 
     //finds all legal moves for a given player.
-    Board[] findMoves(boolean isBlack){
+    Board[] findMoves(boolean isPlayer1){
 
         long jumpersLF;
         long jumpersRF;
@@ -171,7 +171,7 @@ class Board {
         long jumpersRB;
         long jumpers;
 
-        if (isBlack) {
+        if (isPlayer1) {
             jumpersLF = (emptySquares() << 4 & whitePieces) << 4 & blackPieces; //all black pieces that can jump LF
             jumpersRF = (emptySquares() << 5 & whitePieces) << 5 & blackPieces; //all black pieces that can jump RF
             jumpersLB = (emptySquares() >> 5 & whitePieces) >> 5 & blackKings(); //all black kings that can jump LB
@@ -251,7 +251,7 @@ class Board {
             long moversLB;
             long moversRB;
 
-            if (isBlack) {
+            if (isPlayer1) {
                 moversLF = emptySquares() << 4 & blackPieces; //all black pieces that can move LF
                 moversRF = emptySquares() << 5 & blackPieces; //all black pieces that can move RF
                 moversLB = emptySquares() >> 5 & blackKings(); //all black pieces that can move LB
@@ -300,7 +300,7 @@ class Board {
         boolean jumpLB;
         boolean jumpRB;
 
-        if (isBlack(position)){ //is piece black
+        if (isPlayer1(position)){ //is piece black
             jumpLB = false; //assume can't jump backwards
             jumpRB = false;
             if ((positionMask & blackKings()) != 0) { //is piece king, check if can jump backwards

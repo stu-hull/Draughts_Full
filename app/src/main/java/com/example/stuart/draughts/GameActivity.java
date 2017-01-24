@@ -3,6 +3,7 @@ package com.example.stuart.draughts;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -39,7 +40,12 @@ public class GameActivity extends AppCompatActivity {
     TextView player2Label;
     Button undoButton;
 
-    int highlighted;
+    int player1ManID;
+    int player1KingID;
+    int player2ManID;
+    int player2KingID;
+
+    int highlighted = -1;
     Boolean inGame = true;
 
     //handler sends a toast message to the screen
@@ -55,9 +61,9 @@ public class GameActivity extends AppCompatActivity {
             if (endTurn){
                 removeViews();
                 addCounterViews(); //add in counters
-                player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                 player1Label.setTextSize(50);
-                player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
                 player2Label.setTextSize(30);
                 setContentView(layout);
             }
@@ -68,21 +74,21 @@ public class GameActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             System.out.println("Point 1");
-            if (game.getPreviousGameState() != null && !game.inMultiJump){ //if there's a previous gamestate, ie not just undoed and not right at the start, and not in middle of multijump
+            if (game.getPreviousGameState() != null && !game.inMultiJump && inGame){ //if there's a previous gamestate, ie not just undoed and not right at the start, and not in middle of multijump
                 System.out.println("Point 2");
                 game = game.getPreviousGameState();
                 highlighted = -1;
                 removeViews();
                 addCounterViews();
                 if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
-                    player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                    player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                     player1Label.setTextSize(50);
-                    player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                    player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
                     player2Label.setTextSize(30);
                 } else {
-                    player2Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                    player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                     player2Label.setTextSize(50);
-                    player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                    player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
                     player1Label.setTextSize(30);
                 }
                 setContentView(layout);
@@ -118,12 +124,12 @@ public class GameActivity extends AppCompatActivity {
 
         //Set up relativelayout
         layout = new RelativeLayout(this);
-        layout.setBackgroundColor(getResources().getColor(R.color.background));
+        layout.setBackgroundColor(ContextCompat.getColor(this, R.color.background));
 
         //Set up game board
         ImageView gameBoard = new ImageView(this);
         gameBoard.setId(R.id.gameBoard);
-        gameBoard.setImageResource(R.drawable.boardv6);
+        gameBoard.setImageResource(R.drawable.boardv7);
         RelativeLayout.LayoutParams gameBoardParams = new RelativeLayout.LayoutParams(
                 boardSize,
                 boardSize);
@@ -137,7 +143,7 @@ public class GameActivity extends AppCompatActivity {
         player1Label.setId(R.id.player1Label);
         player1Label.setText(R.string.player1);
         player1Label.setTextSize(50);
-        player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+        player1Label.setTextColor(ContextCompat.getColor(this, R.color.yourTurn));
         RelativeLayout.LayoutParams player1LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -151,7 +157,7 @@ public class GameActivity extends AppCompatActivity {
         player2Label.setId(R.id.player2Label);
         player2Label.setText(R.string.player2);
         player2Label.setTextSize(30);
-        player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+        player2Label.setTextColor(ContextCompat.getColor(this, R.color.notYourTurn));
         RelativeLayout.LayoutParams player2LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -184,9 +190,48 @@ public class GameActivity extends AppCompatActivity {
         gameOverMessage.setLayoutParams(gameOverMessageParams);
 
         //set up game with passed in extras
-        game = new Game(getIntent().getBooleanExtra("AGAINST_COMPUTER", true), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
+        game = new Game(getIntent().getBooleanExtra("againstComputer", false), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
 
-        addCounterViews();
+        //set up counter images
+        int player1Colour = getIntent().getIntExtra("player1Colour", 1); //get player 1 colour code
+        switch (player1Colour){
+            case 0:
+                player1ManID = R.drawable.whiteman; //choose image based on colour code
+                player1KingID = R.drawable.whiteking;
+                break;
+            case 1:
+                player1ManID = R.drawable.redman;
+                player1KingID = R.drawable.redking;
+                break;
+            case 2:
+                player1ManID = R.drawable.blackman;
+                player1KingID = R.drawable.blackking;
+                break;
+            default:
+                player1ManID = R.drawable.redman;
+                player1KingID = R.drawable.redking;
+        }
+
+        int player2Colour = getIntent().getIntExtra("player2Colour", 0); //get player 1 colour code
+        switch (player2Colour){
+            case 0:
+                player2ManID = R.drawable.whiteman; //choose image based on colour code
+                player2KingID = R.drawable.whiteking;
+                break;
+            case 1:
+                player2ManID = R.drawable.redman;
+                player2KingID = R.drawable.redking;
+                break;
+            case 2:
+                player2ManID = R.drawable.blackman;
+                player2KingID = R.drawable.blackking;
+                break;
+            default:
+                player2ManID = R.drawable.whiteman;
+                player2KingID = R.drawable.whiteking;
+        }
+
+        addCounterViews(); //add counters to layout
 
         setContentView(layout); //display layout
         System.out.println("DONE");
@@ -200,10 +245,12 @@ public class GameActivity extends AppCompatActivity {
                 finish();
 
             } else if (game.isPlayer1Turn() || !game.isAgainstComputer()) { //else if it's a human's turn, the user needs to input
+                System.out.println("Point 1");
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
                 Board newBoard = userInput(bit); //pass on input to userInput to deal with
 
                 if (newBoard != null) { //if board returned, change currentBoard
+                    System.out.println("Point 2");
                     game.setCurrentBoard(newBoard, highlighted);
                 }
 
@@ -215,9 +262,9 @@ public class GameActivity extends AppCompatActivity {
                     gameOverMessage.setId(R.id.gameOverMessage);
                     if (game.isAgainstComputer() && game.isPlayer1Turn()) { //if player lost against computer
                         gameOverMessage.setText(R.string.youLost);
-                        gameOverMessage.setTextColor(getResources().getColor(R.color.loseColour));
+                        gameOverMessage.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.loseColour));
                     } else {
-                        gameOverMessage.setTextColor(getResources().getColor(R.color.winColour));
+                        gameOverMessage.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.winColour));
                         if (game.isAgainstComputer() && !(game.isPlayer1Turn())) { //if player 1 won against computer
                             gameOverMessage.setText(R.string.youWon);
                         } else if (game.isPlayer1Turn()) { //if player 2 won against human
@@ -234,14 +281,14 @@ public class GameActivity extends AppCompatActivity {
 
                     addCounterViews(); //add in counters
                     if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
-                        player1Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                        player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                         player1Label.setTextSize(50);
-                        player2Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                        player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
                         player2Label.setTextSize(30);
                     } else {
-                        player2Label.setTextColor(getResources().getColor(R.color.yourTurn));
+                        player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                         player2Label.setTextSize(50);
-                        player1Label.setTextColor(getResources().getColor(R.color.notYourTurn));
+                        player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
                         player1Label.setTextSize(30);
                     }
                     setContentView(layout);
@@ -317,8 +364,9 @@ public class GameActivity extends AppCompatActivity {
             throw new IllegalStateException("userInput called when no user input is required");
         }
         if (highlighted == -1){ //if nothing highlighted
-            if (!(game.getCurrentBoard().isEmpty(bit)) && (game.getCurrentBoard().isBlack(bit) == (game.isPlayer1Black() == game.isPlayer1Turn()))){ //if tapped on counter and counter is right colour, highlight counter
+            if (!(game.getCurrentBoard().isEmpty(bit)) && (game.getCurrentBoard().isPlayer1(bit) == (game.isPlayer1Black() == game.isPlayer1Turn()))){ //if tapped on counter and counter is right colour, highlight counter
                 highlighted = bit;
+                System.out.println("Point 3");
             }
         } else {
             if (game.getCurrentBoard().isEmpty(bit)) { //if tapped on empty space
@@ -374,27 +422,27 @@ public class GameActivity extends AppCompatActivity {
     private void addCounterViews(){
 
         int counterIndex = 0;
-        int drawableId;
 
         for (int positionIndex = 0; positionIndex <= 40; positionIndex++) { //for each position
             //decide on image for counter
-            if (positionIndex == highlighted && (game.getCurrentBoard().isBlack(positionIndex) || game.getCurrentBoard().isWhite(positionIndex))){
+            int drawableID;
+            if (positionIndex == highlighted && (game.getCurrentBoard().isPlayer1(positionIndex) || game.getCurrentBoard().isPlayer2(positionIndex))){
                 if (game.getCurrentBoard().isKing(positionIndex)) {
-                    drawableId = R.drawable.kinghighlighted;
+                    drawableID = R.drawable.highlightedking;
                 } else {
-                    drawableId = R.drawable.manhighlighted;
+                    drawableID = R.drawable.highlightedman;
                 }
-            } else if (game.getCurrentBoard().isBlack(positionIndex)){
+            } else if (game.getCurrentBoard().isPlayer1(positionIndex)){
                 if (game.getCurrentBoard().isKing(positionIndex)){
-                    drawableId = R.drawable.redking;
+                    drawableID = player1KingID;
                 } else {
-                    drawableId = R.drawable.redman;
+                    drawableID = player1ManID;
                 }
-            } else if (game.getCurrentBoard().isWhite(positionIndex)) {
+            } else if (game.getCurrentBoard().isPlayer2(positionIndex)) {
                 if (game.getCurrentBoard().isKing(positionIndex)){
-                    drawableId = R.drawable.whiteking;
+                    drawableID = player2KingID;
                 } else {
-                    drawableId = R.drawable.whiteman;
+                    drawableID = player2ManID;
                 }
             } else {
                 continue; //if not black or white, continue loop
@@ -403,7 +451,7 @@ public class GameActivity extends AppCompatActivity {
             //setup counter using ID & drawable
             ImageView counter = new ImageView(this);
             counter.setId(counterIds[counterIndex]);
-            counter.setImageResource(drawableId);
+            counter.setImageResource(drawableID);
             RelativeLayout.LayoutParams counterParams = new RelativeLayout.LayoutParams(
                     squareSize,
                     squareSize);

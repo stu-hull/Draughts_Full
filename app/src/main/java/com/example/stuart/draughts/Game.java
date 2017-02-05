@@ -75,7 +75,6 @@ class Game{
 
     //save current game state to undo to
     void saveGame(){
-        System.out.println("Saving game...");
         previousGameState = new Game(againstComputer, true); //copy game into previousGameState
         previousGameState.currentBoard.copyBoard(this.currentBoard); //copyBoard acts as a deepcopy for Board objects
         previousGameState.legalMoves = new Board[this.legalMoves.length];

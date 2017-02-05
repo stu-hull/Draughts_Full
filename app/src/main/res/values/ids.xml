@@ -33,4 +33,6 @@
     <item name="counter23" type="id"/>
 
     <item name="gameOverMessage" type="id"/>
+
+    <item name="progressBar" type="id"/>
 </resources>

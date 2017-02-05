@@ -1,5 +1,8 @@
 package com.example.stuart.draughts;
 
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -7,11 +10,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +44,7 @@ public class GameActivity extends AppCompatActivity {
     TextView player1Label;
     TextView player2Label;
     Button undoButton;
+    ProgressBar bar;
 
     int player1ManID;
     int player1KingID;
@@ -52,6 +58,7 @@ public class GameActivity extends AppCompatActivity {
     Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+            /*
             Bundle bundle = msg.getData();
             String text = bundle.getString("toastMessage");
             Boolean endTurn = bundle.getBoolean("endTurn");
@@ -67,15 +74,34 @@ public class GameActivity extends AppCompatActivity {
                 player2Label.setTextSize(30);
                 setContentView(layout);
             }
+            */
+            System.out.println("Point 1");
+            int progress = (int) msg.getData().getFloat("progress");
+            if (progress == 0){
+                System.out.println("Point 2");
+                layout.addView(bar);
+            }
+            bar.setProgress(progress);
+            if (progress >= 99){
+                System.out.println("Point 3");
+                ((ViewGroup) bar.getParent()).removeView(bar);
+                removeViews();
+                addCounterViews(); //add in counters
+                player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
+                player1Label.setTextSize(50);
+                player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
+                player2Label.setTextSize(30);
+            }
+            setContentView(layout);
+            System.out.println("Point 4");
+
         }
     };
 
     View.OnClickListener undoMove = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            System.out.println("Point 1");
             if (game.getPreviousGameState() != null && !game.inMultiJump && inGame){ //if there's a previous gamestate, ie not just undoed and not right at the start, and not in middle of multijump
-                System.out.println("Point 2");
                 game = game.getPreviousGameState();
                 highlighted = -1;
                 removeViews();
@@ -92,7 +118,6 @@ public class GameActivity extends AppCompatActivity {
                     player1Label.setTextSize(30);
                 }
                 setContentView(layout);
-                System.out.println("Point 3");
             }
         }
     };
@@ -189,6 +214,19 @@ public class GameActivity extends AppCompatActivity {
         gameOverMessageParams.addRule(RelativeLayout.CENTER_VERTICAL);
         gameOverMessage.setLayoutParams(gameOverMessageParams);
 
+        //set up AI progress bar
+        bar = new ProgressBar(getApplicationContext(), null, android.R.attr.progressBarStyleHorizontal);
+        bar.setId(R.id.progressBar);
+        bar.getProgressDrawable().setColorFilter(0xFF000000 + R.color.progressBarColour, android.graphics.PorterDuff.Mode.MULTIPLY);
+        //bar.setBackgroundColor(ContextCompat.getColor(this, R.color.progressBarColour));
+        RelativeLayout.LayoutParams barParams = new RelativeLayout.LayoutParams(
+                300,
+                30);
+        barParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        barParams.addRule(RelativeLayout.ABOVE, R.id.player2Label);
+        bar.setScaleY(3f);
+        bar.setLayoutParams(barParams);
+
         //set up game with passed in extras
         game = new Game(getIntent().getBooleanExtra("againstComputer", false), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
 
@@ -245,12 +283,10 @@ public class GameActivity extends AppCompatActivity {
                 finish();
 
             } else if (game.isPlayer1Turn() || !game.isAgainstComputer()) { //else if it's a human's turn, the user needs to input
-                System.out.println("Point 1");
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
                 Board newBoard = userInput(bit); //pass on input to userInput to deal with
 
                 if (newBoard != null) { //if board returned, change currentBoard
-                    System.out.println("Point 2");
                     game.setCurrentBoard(newBoard, highlighted);
                 }
 
@@ -297,19 +333,23 @@ public class GameActivity extends AppCompatActivity {
                     if (!game.isPlayer1Turn() && game.isAgainstComputer()) {
                         Runnable runnable = new Runnable() { //setup new thread
                             public void run() {
+                                /*
                                 Message msg = handler.obtainMessage(); //send toast to handler
                                 Bundle bundle = new Bundle();
                                 bundle.putString("toastMessage", getString(R.string.toast1));
                                 bundle.putBoolean("endTurn", false);
                                 msg.setData(bundle);
                                 handler.sendMessage(msg);
-                                game.setCurrentBoard(Ai.minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 7), highlighted); //run minimax algorithm in new thread
+                                */
+                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 7), highlighted); //run minimax algorithm in new thread
+                                /*
                                 msg = handler.obtainMessage(); //send toast to handler
                                 bundle = new Bundle();
                                 bundle.putString("toastMessage", getString(R.string.toast2));
                                 bundle.putBoolean("endTurn", true);
                                 msg.setData(bundle);
                                 handler.sendMessage(msg);
+                                */
                             }
                         };
                         Thread myThread = new Thread(runnable); //run thread
@@ -366,7 +406,6 @@ public class GameActivity extends AppCompatActivity {
         if (highlighted == -1){ //if nothing highlighted
             if (!(game.getCurrentBoard().isEmpty(bit)) && (game.getCurrentBoard().isPlayer1(bit) == (game.isPlayer1Black() == game.isPlayer1Turn()))){ //if tapped on counter and counter is right colour, highlight counter
                 highlighted = bit;
-                System.out.println("Point 3");
             }
         } else {
             if (game.getCurrentBoard().isEmpty(bit)) { //if tapped on empty space
@@ -476,16 +515,53 @@ public class GameActivity extends AppCompatActivity {
             }
             ((ViewGroup) counter.getParent()).removeView(counter);
         }
-        /*
-        //remove gameOverMessage from layout
-        try{
-            ((ViewGroup) gameOverMessage.getParent()).removeView(gameOverMessage);
-        } catch (java.lang.NullPointerException e){} //except if not already in layout
-
-        try{
-            ((ViewGroup) undoButton.getParent()).removeView(undoButton);
-        } catch (java.lang.NullPointerException e){} //except if not already in layout
-        */
     }
+
+    //This is the algorithm called by the AI, it actually runs the real algorithm on each move available and then chooses the best (the real minimax returns a value, not the best move)
+    private Board minimax(Board currentBoard, boolean isBlack, int depth){
+
+        //sleep thread for a second to allow user to see moves more easily
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) { //if interrupted, not really important, just carry on
+        }
+
+        Board[] availableMoves = currentBoard.findMoves(isBlack); //find all the moves available to the player
+
+        Board bestMove = new Board(); //the best possible move
+        bestMove.nullBoard(); //if no moves are available, this empty board will be returned and the Game will recognise this as a surrender
+        double bestScore; //the value of the best possible move
+        double currentScore; //the value of the current move
+
+        if (isBlack) { //if player is black, high scores are good, so default score is as low as possible
+            bestScore = Double.NEGATIVE_INFINITY;
+        } else { //if player white, low scores are good, so default score is as high as possible
+            bestScore = Double.POSITIVE_INFINITY;
+        }
+        int count = 0;
+        for (Board currentMove : availableMoves) { //for each move in the list of possible moves
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            float progress =  count*100/availableMoves.length;
+            bundle.putFloat("progress", progress); //tell handler done
+            msg.setData(bundle);
+            handler.sendMessage(msg); //send progress update to handler
+
+            currentScore = Ai.minimaxV1(currentMove, isBlack, depth-1); //score of current move is found with minimax
+            if ((isBlack && currentScore > bestScore) || (!isBlack && currentScore < bestScore)){ //if current move is better than all before it (or worse if you're white)
+                bestScore = currentScore; //set best score to score of current move
+                bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)
+            }
+            count++;
+        }
+        Message msg = handler.obtainMessage();
+        Bundle bundle = new Bundle();
+        float progress =  count*100/availableMoves.length;
+        bundle.putFloat("progress", progress); //tell handler done
+        msg.setData(bundle);
+        handler.sendMessage(msg);
+
+        return bestMove;
+    } //DONE //TESTED
 
 }

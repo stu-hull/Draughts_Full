@@ -6,37 +6,10 @@ package com.example.stuart.draughts;
  */
 class Ai {
 
-    //This is the algorithm called by the AI, it actually runs the real algorithm on each move available and then chooses the best (the real minimax returns a value, not the best move)
-    static Board minimax(Board currentBoard, boolean isBlack, int depth){
-
-        Board[] availableMoves = currentBoard.findMoves(isBlack); //find all the moves available to the player
-
-        Board bestMove = new Board(); //the best possible move
-        bestMove.nullBoard(); //if no moves are available, this empty board will be returned and the Game will recognise this as a surrender
-        double bestScore; //the value of the best possible move
-        double currentScore; //the value of the current move
-
-        if (isBlack) { //if player is black, high scores are good, so default score is as low as possible
-            bestScore = Double.NEGATIVE_INFINITY;
-        } else { //if player white, low scores are good, so default score is as high as possible
-            bestScore = Double.POSITIVE_INFINITY;
-        }
-
-        for (Board currentMove : availableMoves) { //for each move in the list of possible moves
-            currentScore = minimaxV1(currentMove, isBlack, depth-1); //score of current move is found with minimax
-            if ((isBlack && currentScore > bestScore) || (!isBlack && currentScore < bestScore)){ //if current move is better than all before it (or worse if you're white)
-                bestScore = currentScore; //set best score to score of current move
-                bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)
-            }
-        }
-
-        return bestMove;
-    } //DONE //TESTED
-
     //Version 1 of the minimax algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Testing indicates this algorithm reach 8 plies in around 5 seconds of desktop processing time
     //Special features: none (no ab pruning, no quiscience search, no hash table, nothing)
-    private static double minimaxV1(Board board, boolean isBlack, int depth){
+    static double minimaxV1(Board board, boolean isBlack, int depth){
 
         if (depth == 0){ //if maximum depth is achieved, do not search further; perform the heuristic function
             return heuristicV1(board);

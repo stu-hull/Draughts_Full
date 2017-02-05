@@ -66,21 +66,22 @@ class Ai {
 
     } //DONE //TESTED
 
+    private static final double baseValue = 100; //base value of every piece
+    private static final double kingValue = 100; //kings are worth x more than base value
+    private static final double backValue = 50; //pieces at the back are worth x more than base value
+    private static final double centerValue = 20; //pieces in the center are worth x more than base value
+    private static final double ratioConstant = 0; //changes the weight of a difference in piece count
+
     //Version 1 of the heuristic algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Ideas: incentives to keep back row intact, control central 8 squares, and get kings; value a piece difference greater with fewer pieces on board; blocking option?
     //MAYBE use a genetic algorithm to optimise these values?
     private static double heuristicV1(Board board){
 
-    //the relative values of board positions and other figures
-    double baseValue = 100; //base value of every piece
-    double kingValue = 100; //kings are worth x more than base value
-    double backValue = 20; //pieces at the back are worth x more than base value
-    double centerValue = 0; //pieces in the center are worth x more than base value
-    double ratioConstant = 0; //changes the weight of a difference in piece count
+        //the relative values of board positions and other figures
 
-    double score = 0;
+        double score = 0;
 
-score += Long.bitCount(board.getBlackPieces()) * baseValue;
+        score += Long.bitCount(board.getBlackPieces()) * baseValue;
         score -= Long.bitCount(board.getWhitePieces()) * baseValue;
 
         score += Long.bitCount(board.blackKings()) * kingValue;
@@ -92,11 +93,16 @@ score += Long.bitCount(board.getBlackPieces()) * baseValue;
         score += board.blackCount(Board.maskCenter) * centerValue;
         score -= board.whiteCount(Board.maskCenter) * centerValue;
 
-        score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of black+constant : white+constant
-        score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
+        if (board.blackCount(Board.maskValid) >= board.whiteCount(Board.maskValid)) {
+            score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of white+constant : black+constant
+            score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
+        } else {
+            score *= (Long.bitCount(board.getWhitePieces()) + ratioConstant); //multiply the score by the ratio of white+constant : black+constant
+            score /= (Long.bitCount(board.getBlackPieces()) + ratioConstant);
+        }
 
         return score;
 
-        } //DONE //TESTED
+    } //DONE //TESTED
 
 }

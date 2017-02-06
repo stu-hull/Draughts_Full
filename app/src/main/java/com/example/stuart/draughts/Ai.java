@@ -9,13 +9,13 @@ class Ai {
     //Version 1 of the minimax algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Testing indicates this algorithm reach 8 plies in around 5 seconds of desktop processing time
     //Special features: none (no ab pruning, no quiscience search, no hash table, nothing)
-    static double minimaxV1(Board board, boolean isBlack, int depth){
+    static double minimaxV1(Board board, boolean isBlack, int depth, Boolean optionalCapture){
 
         if (depth == 0){ //if maximum depth is achieved, do not search further; perform the heuristic function
             return heuristicV1(board);
         }
 
-        Board[] availableMoves = board.findMoves(isBlack);
+        Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
 
         double bestScore; //the value of the best possible move
         double currentScore; //the value of the current move
@@ -27,7 +27,7 @@ class Ai {
         }
 
         for (Board currentMove : availableMoves) { //for each move in the list of possible moves
-            currentScore = minimaxV1(currentMove, isBlack, depth - 1); //score of current move is found with minimax
+            currentScore = minimaxV1(currentMove, isBlack, depth - 1, optionalCapture); //score of current move is found with minimax
 
             //isBlack XOR the current score is lower than the best score; IE true if black and current score is greater than the best, or if white and the current score is lower
             if (isBlack != (currentScore < bestScore)){ //is this move the best so far for the current player?

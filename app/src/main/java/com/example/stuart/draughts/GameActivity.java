@@ -1,8 +1,5 @@
 package com.example.stuart.draughts;
 
-import android.graphics.drawable.ClipDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -58,32 +55,12 @@ public class GameActivity extends AppCompatActivity {
     Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            /*
-            Bundle bundle = msg.getData();
-            String text = bundle.getString("toastMessage");
-            Boolean endTurn = bundle.getBoolean("endTurn");
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(getApplicationContext(), text, duration);
-            toast.show();
-            if (endTurn){
-                removeViews();
-                addCounterViews(); //add in counters
-                player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
-                player1Label.setTextSize(50);
-                player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.notYourTurn));
-                player2Label.setTextSize(30);
-                setContentView(layout);
-            }
-            */
-            System.out.println("Point 1");
             int progress = (int) msg.getData().getFloat("progress");
             if (progress == 0){
-                System.out.println("Point 2");
                 layout.addView(bar);
             }
             bar.setProgress(progress);
             if (progress >= 99){
-                System.out.println("Point 3");
                 ((ViewGroup) bar.getParent()).removeView(bar);
                 removeViews();
                 addCounterViews(); //add in counters
@@ -93,8 +70,6 @@ public class GameActivity extends AppCompatActivity {
                 player2Label.setTextSize(30);
             }
             setContentView(layout);
-            System.out.println("Point 4");
-
         }
     };
 
@@ -228,7 +203,10 @@ public class GameActivity extends AppCompatActivity {
         bar.setLayoutParams(barParams);
 
         //set up game with passed in extras
-        game = new Game(getIntent().getBooleanExtra("againstComputer", false), getIntent().getBooleanExtra("PLAYER_1_BLACK", true));
+        Boolean againstComputer = getIntent().getBooleanExtra("againstComputer", false);
+        Boolean optionalCapture = getIntent().getBooleanExtra("optionalCapture", false);
+        Boolean player1Black = getIntent().getBooleanExtra("PLAYER_1_BLACK", true);
+        game = new Game(againstComputer, player1Black, optionalCapture);
 
         //set up counter images
         int player1Colour = getIntent().getIntExtra("player1Colour", 1); //get player 1 colour code
@@ -333,23 +311,7 @@ public class GameActivity extends AppCompatActivity {
                     if (!game.isPlayer1Turn() && game.isAgainstComputer()) {
                         Runnable runnable = new Runnable() { //setup new thread
                             public void run() {
-                                /*
-                                Message msg = handler.obtainMessage(); //send toast to handler
-                                Bundle bundle = new Bundle();
-                                bundle.putString("toastMessage", getString(R.string.toast1));
-                                bundle.putBoolean("endTurn", false);
-                                msg.setData(bundle);
-                                handler.sendMessage(msg);
-                                */
-                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 7), highlighted); //run minimax algorithm in new thread
-                                /*
-                                msg = handler.obtainMessage(); //send toast to handler
-                                bundle = new Bundle();
-                                bundle.putString("toastMessage", getString(R.string.toast2));
-                                bundle.putBoolean("endTurn", true);
-                                msg.setData(bundle);
-                                handler.sendMessage(msg);
-                                */
+                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 7, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
                             }
                         };
                         Thread myThread = new Thread(runnable); //run thread
@@ -518,7 +480,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     //This is the algorithm called by the AI, it actually runs the real algorithm on each move available and then chooses the best (the real minimax returns a value, not the best move)
-    private Board minimax(Board currentBoard, boolean isBlack, int depth){
+    private Board minimax(Board currentBoard, boolean isBlack, int depth, boolean optionalCapture){
 
         //sleep thread for a second to allow user to see moves more easily
         try {
@@ -526,7 +488,7 @@ public class GameActivity extends AppCompatActivity {
         } catch (InterruptedException e) { //if interrupted, not really important, just carry on
         }
 
-        Board[] availableMoves = currentBoard.findMoves(isBlack); //find all the moves available to the player
+        Board[] availableMoves = currentBoard.findMoves(isBlack, optionalCapture); //find all the moves available to the player
 
         Board bestMove = new Board(); //the best possible move
         bestMove.nullBoard(); //if no moves are available, this empty board will be returned and the Game will recognise this as a surrender
@@ -547,7 +509,7 @@ public class GameActivity extends AppCompatActivity {
             msg.setData(bundle);
             handler.sendMessage(msg); //send progress update to handler
 
-            currentScore = Ai.minimaxV1(currentMove, isBlack, depth-1); //score of current move is found with minimax
+            currentScore = Ai.minimaxV1(currentMove, isBlack, depth-1, optionalCapture); //score of current move is found with minimax
             if ((isBlack && currentScore > bestScore) || (!isBlack && currentScore < bestScore)){ //if current move is better than all before it (or worse if you're white)
                 bestScore = currentScore; //set best score to score of current move
                 bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)

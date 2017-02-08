@@ -311,7 +311,7 @@ public class GameActivity extends AppCompatActivity {
                     if (!game.isPlayer1Turn() && game.isAgainstComputer()) {
                         Runnable runnable = new Runnable() { //setup new thread
                             public void run() {
-                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 7, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
+                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 9, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
                             }
                         };
                         Thread myThread = new Thread(runnable); //run thread
@@ -509,7 +509,7 @@ public class GameActivity extends AppCompatActivity {
             msg.setData(bundle);
             handler.sendMessage(msg); //send progress update to handler
 
-            currentScore = Ai.minimaxV1(currentMove, isBlack, depth-1, optionalCapture); //score of current move is found with minimax
+            currentScore = Ai.minimaxV2(currentMove, isBlack, depth-1, optionalCapture, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
             if ((isBlack && currentScore > bestScore) || (!isBlack && currentScore < bestScore)){ //if current move is better than all before it (or worse if you're white)
                 bestScore = currentScore; //set best score to score of current move
                 bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)

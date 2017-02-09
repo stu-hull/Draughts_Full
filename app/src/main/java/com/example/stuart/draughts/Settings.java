@@ -21,6 +21,9 @@ public class Settings extends AppCompatActivity {
         Switch computerToggle = (Switch) findViewById(R.id.computer_toggle); //get human/ai switch
         intent.putExtra("againstComputer", computerToggle.isChecked());
 
+        Switch compulsoryToggle = (Switch) findViewById(R.id.compulsoryToggle); //get optional/forced capture switch
+        intent.putExtra("optionalCapture", compulsoryToggle.isChecked());
+
         intent.putExtra("defaultColours", false); //assume both colours have been selected
 
         RadioButton player1White = (RadioButton) findViewById(R.id.player1White); //fetch radiobuttons

@@ -20,7 +20,7 @@ class Board {
     */
 
     //useful masks for different types of squares on the board
-    private static long maskValid = 0b0000011110111111110111111110111111110111100000L; //all the valid board squares (the 0s are padding)
+    static long maskValid = 0b0000011110111111110111111110111111110111100000L; //all the valid board squares (the 0s are padding)
     static long maskBlackBack = 0b0000011110000000000000000000000000000000000000L; //the home row squares for black
     static long maskWhiteBack = 0b0000000000000000000000000000000000000111100000L; //the home row squares for white
     static long maskCenter = 0b0000000000000000000011001100000000000000000000L; //the central 8 squares (4 playable squares)
@@ -47,9 +47,9 @@ class Board {
     }  //...DONE //TESTED
 
     //the 3 base bitboards used to permanently represent the board (cannot be freely edited)
-    private long blackPieces; //stores the location of all black pieces
-    private long whitePieces; //stores the location of all white pieces
-    private long kings; //stores the location of every king, black or white
+    long blackPieces; //stores the location of all black pieces
+    long whitePieces; //stores the location of all white pieces
+    long kings; //stores the location of every king, black or white
 
     long getBlackPieces(){
         return blackPieces;
@@ -160,7 +160,7 @@ class Board {
         }
 
         return afterMove;
-    }  //...DONE //TESTED
+    }  //...DONE
 
     //finds all legal moves for a given player.
     Board[] findMoves(boolean isPlayer1, boolean optionalCapture){
@@ -302,7 +302,7 @@ class Board {
 
         totalMoves = trim(totalMoves);
         return totalMoves;
-
+      
     } //...DONE
 
     //looks at a single piece which has just jumped, and returns all possible multi jumps it can do afterwards as well as the single jump
@@ -387,6 +387,6 @@ class Board {
 
         totalMoves = trim(totalMoves);
         return totalMoves;
-    } //...DONE //TESTED
+    } //...DONE
 
 }

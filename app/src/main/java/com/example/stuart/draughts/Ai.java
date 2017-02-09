@@ -40,6 +40,7 @@ class Ai {
 
     } //DONE //TESTED
 
+
     //Version 2 of the minimax algorithm, including alpha-beta pruning
     //This version can reach 9 plies slightly faster than V1 reaches 7 plies, which makes sense (7 * 4/3 = 9.3333)
     static double minimaxV2(Board board, boolean isBlack, int depth, boolean optionalCapture, double alpha, double beta){
@@ -120,32 +121,13 @@ class Ai {
         score += board.blackCount(Board.maskCenter) * centerValue;
         score -= board.whiteCount(Board.maskCenter) * centerValue;
 
-        score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of black+constant : white+constant
-        score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
-
-        return score;
-
-    } //DONE //TESTED
-
-    //Version 2 of the heurstic algorithm, taking into account runaway checkers
-    private static double heuristicV2(Board board){
-
-        double score = 0;
-
-        score += Long.bitCount(board.getBlackPieces()) * baseValue;
-        score -= Long.bitCount(board.getWhitePieces()) * baseValue;
-
-        score += Long.bitCount(board.blackKings()) * kingValue;
-        score -= Long.bitCount(board.whiteKings()) * kingValue;
-
-        score += board.blackCount(Board.maskBlackBack) * backValue;
-        score -= board.whiteCount(Board.maskWhiteBack) * backValue;
-
-        score += board.blackCount(Board.maskCenter) * centerValue;
-        score -= board.whiteCount(Board.maskCenter) * centerValue;
-
-        score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of black+constant : white+constant
-        score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
+        if (board.blackCount(Board.maskValid) >= board.whiteCount(Board.maskValid)) {
+            score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of white+constant : black+constant
+            score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
+        } else {
+            score *= (Long.bitCount(board.getWhitePieces()) + ratioConstant); //multiply the score by the ratio of white+constant : black+constant
+            score /= (Long.bitCount(board.getBlackPieces()) + ratioConstant);
+        }
 
         for (int position = 40; position > 4; position--) { //count back board positions
             if (board.isPlayer2(position)){ //keep going until a player2 piece is reached
@@ -164,6 +146,6 @@ class Ai {
 
         return score;
 
-    }
+    } //DONE //TESTED
 
 }

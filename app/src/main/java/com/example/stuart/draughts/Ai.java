@@ -40,9 +40,11 @@ class Ai {
 
     } //DONE //TESTED
 
+    //Version 2 of the minimax algorithm, including alpha-beta pruning
+    //This version can reach 9 plies slightly faster than V1 reaches 7 plies, which makes sense (7 * 4/3 = 9.3333)
     static double minimaxV2(Board board, boolean isBlack, int depth, boolean optionalCapture, double alpha, double beta){
         if (depth == 0){
-            return heuristicV1(board);
+            return heuristicV2(board);
         }
 
         Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
@@ -91,88 +93,22 @@ class Ai {
 
     }
 
-    public static void main(String[] args){
-        double x = mini(true, 4, false, -Double.MAX_VALUE, Double.MAX_VALUE);
-        System.out.println("Final result: " + Double.toString(x));
-    }
-
-    static double mini(boolean isBlack, int depth, Boolean optionalCapture, double alpha, double beta){
-        System.out.println("Starting algorithm at layer " + Integer.toString(depth) + " with a and b values of " + Double.toString(alpha) + " and " + Double.toString(beta));
-        if (depth == 0){
-            double value = p();
-            System.out.println("Depth = 0; returning heuristic value of: " + Double.toString(value));
-            return value;
-        }
-
-        double currentScore; //the value of the current move
-        if (isBlack) {
-            double bestScore = -Double.MAX_VALUE;
-            for (int i = 0; i < 2; i++) {
-                System.out.println("Looking at move " + Integer.toString(i));
-                currentScore = mini(!isBlack, depth - 1, optionalCapture, alpha, beta);
-                if (currentScore > bestScore){
-                    System.out.println("Best on this node so far");
-                    bestScore = currentScore;
-                    if (bestScore > alpha) {
-                        System.out.println("Best for maximiser so far");
-                        alpha = bestScore;
-                        if (alpha >= beta) {
-                            System.out.println("Cutoff, returning bestScore = " + Double.toString(bestScore));
-                            break;
-                        }
-                    }
-                }
-            }
-            System.out.println("Execution complete, returning value of: " + Double.toString(bestScore));
-            return bestScore;
-
-        } else {
-            double bestScore = Double.MAX_VALUE;
-            for (int i = 0; i < 2; i++) {
-                System.out.println("Looking at move " + Integer.toString(i));
-                currentScore = mini(!isBlack, depth - 1, optionalCapture, alpha, beta);
-                if (currentScore < bestScore) {
-                    System.out.println("Best on this node so far");
-                    bestScore = currentScore;
-                    if (bestScore < beta) {
-                        System.out.println("Best for minimiser so far");
-                        beta = bestScore;
-                        if (alpha >= beta) {
-                            System.out.println("Cutoff, returning bestScore = " + Double.toString(bestScore));
-                            break;
-                        }
-                    }
-                }
-            }
-            System.out.println("Execution complete, returning value of: " + Double.toString(bestScore));
-            return bestScore;
-        }
-
-    }
-
-    private static int i = -1;
-    private static double p(){
-        int[] array = new int[]{10, 11, 9, 14, 15, 5, 4};
-        i++;
-        return array[i];
-    }
-
+    //the relative values of board positions and other figures
+    private static final float baseValue = 100; //base value of every piece
+    private static final float kingValue = 100; //kings are worth x more than base value
+    private static final float backValue = 20; //pieces at the back are worth x more than base value
+    private static final float centerValue = 0; //pieces in the center are worth x more than base value
+    private static final float ratioConstant = 0; //changes the weight of a difference in piece count
+    private static final float freePiece = 70; //pieces past all opposition which are guaranteed to become kings
 
     //Version 1 of the heuristic algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Ideas: incentives to keep back row intact, control central 8 squares, and get kings; value a piece difference greater with fewer pieces on board; blocking option?
     //MAYBE use a genetic algorithm to optimise these values?
     private static double heuristicV1(Board board){
 
-    //the relative values of board positions and other figures
-    double baseValue = 100; //base value of every piece
-    double kingValue = 100; //kings are worth x more than base value
-    double backValue = 20; //pieces at the back are worth x more than base value
-    double centerValue = 0; //pieces in the center are worth x more than base value
-    double ratioConstant = 0; //changes the weight of a difference in piece count
+        double score = 0;
 
-    double score = 0;
-
-score += Long.bitCount(board.getBlackPieces()) * baseValue;
+        score += Long.bitCount(board.getBlackPieces()) * baseValue;
         score -= Long.bitCount(board.getWhitePieces()) * baseValue;
 
         score += Long.bitCount(board.blackKings()) * kingValue;
@@ -189,6 +125,45 @@ score += Long.bitCount(board.getBlackPieces()) * baseValue;
 
         return score;
 
-        } //DONE //TESTED
+    } //DONE //TESTED
+
+    //Version 2 of the heurstic algorithm, taking into account runaway checkers
+    private static double heuristicV2(Board board){
+
+        double score = 0;
+
+        score += Long.bitCount(board.getBlackPieces()) * baseValue;
+        score -= Long.bitCount(board.getWhitePieces()) * baseValue;
+
+        score += Long.bitCount(board.blackKings()) * kingValue;
+        score -= Long.bitCount(board.whiteKings()) * kingValue;
+
+        score += board.blackCount(Board.maskBlackBack) * backValue;
+        score -= board.whiteCount(Board.maskWhiteBack) * backValue;
+
+        score += board.blackCount(Board.maskCenter) * centerValue;
+        score -= board.whiteCount(Board.maskCenter) * centerValue;
+
+        score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of black+constant : white+constant
+        score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
+
+        for (int position = 40; position > 4; position--) { //count back board positions
+            if (board.isPlayer2(position)){ //keep going until a player2 piece is reached
+                break;
+            } else if (board.isPlayer1(position)){ //if player1, piece has gotten past all opposition
+                score += freePiece;
+            }
+        }
+        for (int position = 5; position < 41; position++) { //count up board positions
+            if (board.isPlayer1(position)){ //keep going until a player1 piece is reached
+                break;
+            } else if (board.isPlayer2(position)){ //if player2, piece has gotten past all opposition
+                score -= freePiece;
+            }
+        }
+
+        return score;
+
+    }
 
 }

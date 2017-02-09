@@ -9,6 +9,7 @@ import android.view.View;
 public class MainMenu extends AppCompatActivity {
 
     Boolean againstComputer;
+    Boolean optionalCapture;
     int player1Colour;
     int player2Colour;
 
@@ -25,6 +26,7 @@ public class MainMenu extends AppCompatActivity {
     public void startGame(View view) {
         Intent intent = new Intent(MainMenu.this, GameActivity.class);
         intent.putExtra("againstComputer", againstComputer);
+        intent.putExtra("optionalCapture", optionalCapture);
         intent.putExtra("player1Colour", player1Colour);
         intent.putExtra("player2Colour", player2Colour);
         startActivity(intent);
@@ -38,17 +40,10 @@ public class MainMenu extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        System.out.println("1");
-        System.out.println("--- -Y- ---");
-        System.out.println(requestCode);
-        System.out.println(resultCode);
-        System.out.println(RESULT_OK);
-        System.out.println("--- --- ---");
         if (requestCode == 1){
-            System.out.println("2");
             if (resultCode == RESULT_OK){
-                System.out.println("3");
                 againstComputer = data.getExtras().getBoolean("againstComputer");
+                optionalCapture = data.getExtras().getBoolean("optionalCapture");
                 if (data.getExtras().getBoolean("defaultColours", true)){
                     player1Colour = 1;
                     player2Colour = 0;

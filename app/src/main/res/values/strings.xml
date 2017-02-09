@@ -33,5 +33,9 @@
     <string name="playerBlack">Black</string>
     <string name="settings">Settings</string>
 
+    <string name="compulsoryCapture">Optional Captures</string>
+    <string name="compulsoryOn">on</string>
+    <string name="compulsoryOff">off</string>
+
 
 </resources>

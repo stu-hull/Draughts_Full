@@ -26,7 +26,19 @@
             android:textOn="@string/computer_on"
             android:textOff="@string/computer_off"
             android:layout_marginTop="15dp"
+            android:switchPadding="10dp"
             android:id="@+id/computer_toggle"/>
+
+        <Switch
+            android:text="@string/compulsoryCapture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textOn="@string/compulsoryOn"
+            android:textOff="@string/compulsoryOff"
+            android:layout_marginTop="5dp"
+            android:switchPadding="10dp"
+            android:id="@+id/compulsoryToggle"/>
 
         <TextView
             android:layout_width="wrap_content"

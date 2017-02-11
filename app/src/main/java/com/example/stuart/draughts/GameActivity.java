@@ -386,6 +386,10 @@ public class GameActivity extends AppCompatActivity {
                             game.saveGame();
                             return newBoard;
                         }
+                    } else if (newBoard.kingCount(Board.maskValid) > game.getCurrentBoard().kingCount(Board.maskValid)){ //else if piece became a king, make move and reset regardless
+                        highlighted = -1;
+                        game.saveGame();
+                        return newBoard;
                     } else {
                         Board[] newNewBoards = newBoard.findMultiJump(bit); //find all further possible jumps
                         if (newNewBoards.length > 1) { //if more jumps available, make move, keep piece highlighted, and record that only multi jumps allowed

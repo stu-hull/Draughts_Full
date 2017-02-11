@@ -41,7 +41,7 @@ class Game{
     boolean isAgainstComputer() {
         return againstComputer;
     }
-    public boolean isOptionalCapture() {
+    boolean isOptionalCapture() {
         return optionalCapture;
     }
     boolean isPlayer1Black() {

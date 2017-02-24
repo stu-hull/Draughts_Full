@@ -13,7 +13,7 @@ class Game{
 
     private Board currentBoard; //current board being displayed
     private Board[] legalMoves; //array of legal moves available
-    Boolean inMultiJump = false;
+    boolean inMultiJump = false;
     private Board temporaryBoard;
     private Board[] temporaryLegalMoves;
 
@@ -75,6 +75,7 @@ class Game{
             currentBoard = newBoard;
             player1Turn = !player1Turn;
             legalMoves = currentBoard.findMoves(player1Turn == player1Black, optionalCapture);
+            System.out.println(Ai.heuristicV2(currentBoard));
         }
     }
 
@@ -89,7 +90,5 @@ class Game{
         }
         previousGameState.player1Turn = this.player1Turn;
     }
-
-
 
 }

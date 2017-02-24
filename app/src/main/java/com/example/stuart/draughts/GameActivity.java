@@ -21,6 +21,7 @@ import android.widget.Toast;
 public class GameActivity extends AppCompatActivity {
 
     public Game game;
+    private Ai marvin;
     RelativeLayout layout;
 
     //details about screen dimensions
@@ -43,6 +44,8 @@ public class GameActivity extends AppCompatActivity {
     Button undoButton;
     ProgressBar bar;
 
+    Thread myThread;
+
     int player1ManID;
     int player1KingID;
     int player2ManID;
@@ -56,6 +59,9 @@ public class GameActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             int progress = (int) msg.getData().getFloat("progress");
+            if (game.isPlayer1Turn() && !(progress >= 99)){
+                return;
+            }
             if (progress == 0){
                 layout.addView(bar);
             }
@@ -79,6 +85,9 @@ public class GameActivity extends AppCompatActivity {
             if (game.getPreviousGameState() != null && !game.inMultiJump && inGame){ //if there's a previous gamestate, ie not just undoed and not right at the start, and not in middle of multijump
                 game = game.getPreviousGameState();
                 highlighted = -1;
+
+                ((ViewGroup) bar.getParent()).removeView(bar);
+
                 removeViews();
                 addCounterViews();
                 if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
@@ -207,6 +216,9 @@ public class GameActivity extends AppCompatActivity {
         Boolean optionalCapture = getIntent().getBooleanExtra("optionalCapture", false);
         Boolean player1Black = getIntent().getBooleanExtra("PLAYER_1_BLACK", true);
         game = new Game(againstComputer, player1Black, optionalCapture);
+        if (againstComputer){
+            marvin = new Ai(optionalCapture);
+        }
 
         //set up counter images
         int player1Colour = getIntent().getIntExtra("player1Colour", 1); //get player 1 colour code
@@ -314,7 +326,7 @@ public class GameActivity extends AppCompatActivity {
                                 game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 9, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
                             }
                         };
-                        Thread myThread = new Thread(runnable); //run thread
+                        myThread = new Thread(runnable); //run thread
                         myThread.start();
                     }
                 }
@@ -512,8 +524,10 @@ public class GameActivity extends AppCompatActivity {
             bundle.putFloat("progress", progress); //tell handler done
             msg.setData(bundle);
             handler.sendMessage(msg); //send progress update to handler
-
-            currentScore = Ai.minimaxV2(currentMove, isBlack, depth-1, optionalCapture, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
+            //if (optionalCapture){
+            //    depth -= 1;
+            //}
+            currentScore = marvin.minimaxV3(currentMove, isBlack, depth-1, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
             if ((isBlack && currentScore > bestScore) || (!isBlack && currentScore < bestScore)){ //if current move is better than all before it (or worse if you're white)
                 bestScore = currentScore; //set best score to score of current move
                 bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)

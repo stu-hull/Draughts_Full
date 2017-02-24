@@ -1,5 +1,7 @@
 package com.example.stuart.draughts;
 
+import java.util.Random;
+
 /**
  * Created by Stuart on 30/08/2016.
  * A board representation, holding a board state using bitboards and small functions to query the board
@@ -47,9 +49,9 @@ class Board {
     }  //...DONE //TESTED
 
     //the 3 base bitboards used to permanently represent the board (cannot be freely edited)
-    long blackPieces; //stores the location of all black pieces
-    long whitePieces; //stores the location of all white pieces
-    long kings; //stores the location of every king, black or white
+    private long blackPieces; //stores the location of all black pieces
+    private long whitePieces; //stores the location of all white pieces
+    private long kings; //stores the location of every king, black or white
 
     long getBlackPieces(){
         return blackPieces;
@@ -77,6 +79,10 @@ class Board {
         whitePieces = original.getWhitePieces();
         kings = original.getKings();
     } //sets up a board as a copy of another board
+
+    public boolean equals(Board board){
+        return (this.blackPieces == board.blackPieces) && (this.whitePieces == board.whitePieces) && (this.kings == board.kings);
+    }
 
     //methods to return bitboards calculated from the 3 base bitboards used to store the board
     public long blackMen(){
@@ -371,5 +377,13 @@ class Board {
         totalMoves = trim(totalMoves);
         return totalMoves;
     } //...DONE
+
+    void random(){
+        Random r = new Random();
+        blackPieces = r.nextLong();
+        whitePieces = r.nextLong();
+        kings = r.nextLong();
+    }
+
 
 }

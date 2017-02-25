@@ -27,11 +27,6 @@ class Board {
     static long maskWhiteBack = 0b0000000000000000000000000000000000000111100000L; //the home row squares for white
     static long maskCenter = 0b0000000000000000000011001100000000000000000000L; //the central 8 squares (4 playable squares)
 
-    //takes an integer board position, and creates a mask for that position
-    private static long findMask(int position){
-        return 1L<<(long)(45-position);
-    } //DONE //TESTED
-
     //takes an integer board position and finds whether that board position is valid
     private static Boolean isValid(int position){
         return ((maskValid & 1L<<(long)(45-position)) != 0L);
@@ -106,13 +101,13 @@ class Board {
 
     //methods to query the board
     boolean isPlayer1(int position){
-        return ((findMask(position) & blackPieces) != 0);
+        return ((1L<<(long)(45-position) & blackPieces) != 0);
     } //returns true if a given position has a black piece
     boolean isPlayer2(int position){
-        return ((findMask(position) & whitePieces) != 0);
+        return ((1L<<(long)(45-position) & whitePieces) != 0);
     } //returns true if a given position has a white piece
     boolean isKing(int position){
-        return ((findMask(position) & kings) != 0);
+        return ((1L<<(long)(45-position) & kings) != 0);
     }  //returns true if a given position has a king
     boolean isEmpty(int position){
         return (!(isPlayer1(position)) && !(isPlayer2(position)) && isValid(position));
@@ -140,32 +135,32 @@ class Board {
         if ((source-destination)*(source-destination) > 25) {
             int captured = (source + destination) / 2;
             if (isPlayer1(source)){
-                afterMove.whitePieces -= findMask(captured);
+                afterMove.whitePieces -= 1L<<(long)(45-captured);
             } else {
-                afterMove.blackPieces -= findMask(captured);
+                afterMove.blackPieces -= 1L<<(long)(45-captured);
             }
             if (isKing(captured)){ //if captured piece is king, king bit must be removed
-                afterMove.kings -= findMask(captured);
+                afterMove.kings -= 1L<<(long)(45-captured);
             }
         }
 
         //remove piece from source and replace at destination
         if (isPlayer1(source)){
-            afterMove.blackPieces -= findMask(source);
-            afterMove.blackPieces += findMask(destination);
+            afterMove.blackPieces -= 1L<<(long)(45-source);
+            afterMove.blackPieces += 1L<<(long)(45-destination);
             if (destination >= 37 && !(afterMove.isKing(source))){ //if at end and counter's not a king already, make a king
-                afterMove.kings += findMask(destination);
+                afterMove.kings +=1L<<(long)(45-destination);
             }
         } else {
-            afterMove.whitePieces -= findMask(source);
-            afterMove.whitePieces += findMask(destination);
+            afterMove.whitePieces -= 1L<<(long)(45-source);
+            afterMove.whitePieces += 1L<<(long)(45-destination);
             if (destination <= 8 && !(afterMove.isKing(source))){ //if at end and counter's not a king already, make a king
-                afterMove.kings += findMask(destination);
+                afterMove.kings += 1L<<(long)(45-destination);
             }
         }
         if (isKing(source)){ //if king, king bit indicator must move too
-            afterMove.kings -= findMask(source);
-            afterMove.kings += findMask(destination);
+            afterMove.kings -= 1L<<(long)(45-source);
+            afterMove.kings += 1L<<(long)(45-destination);
         }
 
         return afterMove;
@@ -200,7 +195,7 @@ class Board {
             Board[] furtherMoves; //all possible moves by a given piece
 
             for (int position = 5; position <= 40; position++) { //go through all board positions
-                if ((jumpersLF & findMask(position)) != 0) { //if it can jump LF
+                if ((jumpersLF & 1L<<(long)(45-position)) != 0) { //if it can jump LF
                     Board afterJump = this.makeSimpleMove(position, position + 8); //make the jump
                     if (afterJump.kingCount(maskValid) > this.kingCount(maskValid)){
                         totalMoves[totalMoveCount] = afterJump;
@@ -211,7 +206,7 @@ class Board {
                         totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                     }
                 }
-                if ((jumpersRF & findMask(position)) != 0) { //if it can jump RF
+                if ((jumpersRF & 1L<<(long)(45-position)) != 0) { //if it can jump RF
                     Board afterJump = this.makeSimpleMove(position, position + 10); //make the jump
                     if (afterJump.kingCount(maskValid) > this.kingCount(maskValid)){
                         totalMoves[totalMoveCount] = afterJump;
@@ -222,7 +217,7 @@ class Board {
                         totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                     }
                 }
-                if ((jumpersLB & Board.findMask(position)) != 0) { //if it can jump LB
+                if ((jumpersLB & 1L<<(long)(45-position)) != 0) { //if it can jump LB
                     Board afterJump = this.makeSimpleMove(position, position - 10); //make the jump
                     if (afterJump.kingCount(maskValid) > this.kingCount(maskValid)){
                         totalMoves[totalMoveCount] = afterJump;
@@ -233,7 +228,7 @@ class Board {
                         totalMoveCount += furtherMoves.length; //add number of possible jumps to the total move count
                     }
                 }
-                if ((jumpersRB & Board.findMask(position)) != 0) { //if it can jump RB
+                if ((jumpersRB & 1L<<(long)(45-position)) != 0) { //if it can jump RB
                     Board afterJump = this.makeSimpleMove(position, position - 8); //make the jump
                     if (afterJump.kingCount(maskValid) > this.kingCount(maskValid)){
                         totalMoves[totalMoveCount] = afterJump;
@@ -271,19 +266,19 @@ class Board {
         }
 
         for (int position = 5; position <= 40; position++) { //for each board position
-            if ((moversLF & Board.findMask(position)) != 0) { //if it can move LF
+            if ((moversLF & 1L<<(long)(45-position)) != 0) { //if it can move LF
                 totalMoves[totalMoveCount] = this.makeSimpleMove(position, position + 4); //add move to total
                 totalMoveCount += 1; //move counter increases
             }
-            if ((moversRF & Board.findMask(position)) != 0) { //if it can move RF
+            if ((moversRF & 1L<<(long)(45-position)) != 0) { //if it can move RF
                 totalMoves[totalMoveCount] = this.makeSimpleMove(position, position + 5); //add move to total
                 totalMoveCount += 1; //move counter increases
             }
-            if ((moversLB & Board.findMask(position)) != 0) { //if it can move LB
+            if ((moversLB & 1L<<(long)(45-position)) != 0) { //if it can move LB
                 totalMoves[totalMoveCount] = this.makeSimpleMove(position, position - 5); //add move to total
                 totalMoveCount += 1; //move counter increases
             }
-            if ((moversRB & Board.findMask(position)) != 0) { //if it can move RB
+            if ((moversRB & 1L<<(long)(45-position)) != 0) { //if it can move RB
                 totalMoves[totalMoveCount] = this.makeSimpleMove(position, position - 4); //add move to total
                 totalMoveCount += 1; //move counter increases
             }
@@ -296,7 +291,7 @@ class Board {
 
     //looks at a single piece which has just jumped, and returns all possible multi jumps it can do afterwards as well as the single jump
     Board[] findMultiJump(int position){
-        long positionMask = findMask(position);
+        long positionMask = 1L<<(long)(45-position);
 
         boolean jumpLF;
         boolean jumpRF;

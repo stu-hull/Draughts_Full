@@ -373,12 +373,5 @@ class Board {
         return totalMoves;
     } //...DONE
 
-    void random(){
-        Random r = new Random();
-        blackPieces = r.nextLong();
-        whitePieces = r.nextLong();
-        kings = r.nextLong();
-    }
-
 
 }

@@ -330,7 +330,7 @@ public class GameActivity extends AppCompatActivity {
                     if (!game.isPlayer1Turn() && game.isAgainstComputer()) {
                         Runnable runnable = new Runnable() { //setup new thread
                             public void run() {
-                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 9, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
+                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 13, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
                             }
                         };
                         myThread = new Thread(runnable); //run thread

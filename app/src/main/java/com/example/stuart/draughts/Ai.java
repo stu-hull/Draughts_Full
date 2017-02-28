@@ -15,6 +15,14 @@ class Ai {
         this.optionalCapture = optionalCapture;
     }
 
+    public static void main(String[] args){
+        Ai marvin = new Ai(false);
+        for (int i = 0; i < 7; i++) {
+            marvin.minimaxV3(new Board(), false, 15, -Double.MAX_VALUE, Double.MAX_VALUE);
+        }
+        System.out.println("Done");
+    }
+
 
     private class Data{
         Data(double value, int depth, int specificity){

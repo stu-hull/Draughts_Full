@@ -1,0 +1,8 @@
+//
+// Created by Stuart on 26/02/2017.
+//
+
+#ifndef DRAUGHTS_FULL_NATIVE_LIB_H
+#define DRAUGHTS_FULL_NATIVE_LIB_H
+
+#endif //DRAUGHTS_FULL_NATIVE_LIB_H

@@ -61,12 +61,6 @@ public class GameActivity extends AppCompatActivity {
             System.out.println("\nMessage being handled");
             int progress = (int) msg.getData().getFloat("progress");
             System.out.println("Progress: " + Integer.toString(progress));
-            /*
-            if (game.isPlayer1Turn() && !(progress >= 99)){ //if player 1's turn, ignore message
-                System.out.println("Interrupted- ignore message");
-                return;
-            }
-            */
             if (progress == 0){
                 System.out.println("progress 0- add bar");
                 layout.addView(bar);
@@ -76,7 +70,7 @@ public class GameActivity extends AppCompatActivity {
             if (progress >= 99){
                 System.out.println("Progress >= 99%, remove bar, reset counters, change labels");
                 ((ViewGroup) bar.getParent()).removeView(bar);
-                removeViews();
+                removeCounterViews();
                 addCounterViews(); //add in counters
                 player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
                 player1Label.setTextSize(50);
@@ -95,7 +89,7 @@ public class GameActivity extends AppCompatActivity {
                 game = game.getPreviousGameState();
                 highlighted = -1;
 
-                removeViews();
+                removeCounterViews();
                 addCounterViews();
                 if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
                     player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.yourTurn));
@@ -124,7 +118,7 @@ public class GameActivity extends AppCompatActivity {
         boardSize = (int)(metrics.widthPixels - 50*metrics.density); //size is width of screen minus 50dp (dp is converted to px by multiplying by density)
         squareSize = (boardSize/8);
         square0width = ((metrics.widthPixels - boardSize)/2); //first column from the left
-        square0height = (int) (((0.82*metrics.heightPixels + boardSize)/2));// - 1.35*squareSize); //first row up from bottom
+        square0height = (int) (((0.833*metrics.heightPixels + boardSize)/2));// - 1.35*squareSize); //first row up from bottom
         coordinates = new int[][]{ //coordinates of each square on the board, in pixels
                 {0,0}, {0,0}, {0,0}, {0,0}, {0,0},
                 {square0width, square0height}, {square0width+2*squareSize, square0height},  {square0width+4*squareSize, square0height},  {square0width+6*squareSize, square0height}, {0,0},
@@ -287,7 +281,7 @@ public class GameActivity extends AppCompatActivity {
                     game.setCurrentBoard(newBoard, highlighted);
                 }
 
-                removeViews(); //clear views
+                removeCounterViews(); //clear views
 
                 if (game.getLegalMoves().length == 0) { //if no moves left, game has ended
                     inGame = false;
@@ -330,7 +324,7 @@ public class GameActivity extends AppCompatActivity {
                     if (!game.isPlayer1Turn() && game.isAgainstComputer()) {
                         Runnable runnable = new Runnable() { //setup new thread
                             public void run() {
-                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 13, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
+                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 9, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
                             }
                         };
                         myThread = new Thread(runnable); //run thread
@@ -490,8 +484,8 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    //removes all views from layout, excluding gameboard, player labels
-    private void removeViews(){
+    //removes all counter views from layout, excluding gameboard, player labels
+    private void removeCounterViews(){
         //remove counters from layout
         for (int id : counterIds){
             ImageView counter = (ImageView) findViewById(id);
@@ -526,6 +520,9 @@ public class GameActivity extends AppCompatActivity {
             bestScore = Double.POSITIVE_INFINITY;
         }
         int count = 0;
+        if (optionalCapture){
+            depth -= 1;
+        }
         for (Board currentMove : availableMoves) { //for each move in the list of possible moves
             Message msg = handler.obtainMessage();
             Bundle bundle = new Bundle();
@@ -533,9 +530,6 @@ public class GameActivity extends AppCompatActivity {
             bundle.putFloat("progress", progress); //tell handler done
             msg.setData(bundle);
             handler.sendMessage(msg); //send progress update to handler
-            if (optionalCapture){
-                depth -= 1;
-            }
             currentScore = marvin.minimaxV3(currentMove, isBlack, depth-1, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
             if ((isBlack && currentScore > bestScore) || (!isBlack && currentScore < bestScore)){ //if current move is better than all before it (or worse if you're white)
                 bestScore = currentScore; //set best score to score of current move

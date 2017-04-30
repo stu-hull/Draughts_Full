@@ -2,6 +2,8 @@ package com.example.stuart.draughts;
 
 import android.os.Handler;
 import android.os.Message;
+import android.provider.*;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +23,7 @@ import android.widget.Toast;
 public class GameActivity extends AppCompatActivity {
 
     public Game game;
-    private Ai marvin;
+    private Ai hal;
     RelativeLayout layout;
 
     //details about screen dimensions
@@ -58,17 +60,12 @@ public class GameActivity extends AppCompatActivity {
     Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            System.out.println("\nMessage being handled");
             int progress = (int) msg.getData().getFloat("progress");
-            System.out.println("Progress: " + Integer.toString(progress));
             if (progress == 0){
-                System.out.println("progress 0- add bar");
                 layout.addView(bar);
             }
             bar.setProgress(progress);
-            System.out.println("Progress set as " + Integer.toString(progress));
             if (progress >= 99){
-                System.out.println("Progress >= 99%, remove bar, reset counters, change labels");
                 ((ViewGroup) bar.getParent()).removeView(bar);
                 removeCounterViews();
                 addCounterViews(); //add in counters
@@ -215,10 +212,9 @@ public class GameActivity extends AppCompatActivity {
         //set up game with passed in extras
         Boolean againstComputer = getIntent().getBooleanExtra("againstComputer", false);
         Boolean optionalCapture = getIntent().getBooleanExtra("optionalCapture", false);
-        Boolean player1Black = getIntent().getBooleanExtra("PLAYER_1_BLACK", true);
-        game = new Game(againstComputer, player1Black, optionalCapture);
+        game = new Game(againstComputer, optionalCapture);
         if (againstComputer){
-            marvin = new Ai(optionalCapture);
+            hal = new Ai(optionalCapture);
         }
 
         //set up counter images
@@ -270,6 +266,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            System.out.println(game.isPlayer1Turn());
             if (!inGame) { //if the game has ended, return to main menu upon touch
                 finish();
 
@@ -324,7 +321,7 @@ public class GameActivity extends AppCompatActivity {
                     if (!game.isPlayer1Turn() && game.isAgainstComputer()) {
                         Runnable runnable = new Runnable() { //setup new thread
                             public void run() {
-                                game.setCurrentBoard(minimax(game.getCurrentBoard(), !game.isPlayer1Black(), 9, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
+                                game.setCurrentBoard(minimax(game.getCurrentBoard() , 8, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
                             }
                         };
                         myThread = new Thread(runnable); //run thread
@@ -378,8 +375,10 @@ public class GameActivity extends AppCompatActivity {
         if (game.isAgainstComputer() && !(game.isPlayer1Turn())){
             throw new IllegalStateException("userInput called when no user input is required");
         }
+        System.out.println(game.isPlayer1Turn());
+        System.out.println(game.getCurrentBoard().isPlayer1(bit));
         if (highlighted == -1){ //if nothing highlighted
-            if (!(game.getCurrentBoard().isEmpty(bit)) && (game.getCurrentBoard().isPlayer1(bit) == (game.isPlayer1Black() == game.isPlayer1Turn()))){ //if tapped on counter and counter is right colour, highlight counter
+            if (!(game.getCurrentBoard().isEmpty(bit)) && (game.getCurrentBoard().isPlayer1(bit) == game.isPlayer1Turn())){ //if tapped on counter and counter is right colour, highlight counter
                 highlighted = bit;
             }
         } else {
@@ -497,9 +496,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     //This is the algorithm called by the AI, it actually runs the real algorithm on each move available and then chooses the best (the real minimax returns a value, not the best move)
-    private Board minimax(Board currentBoard, boolean isBlack, int depth, boolean optionalCapture){
-
-        System.out.println(isBlack);
+    private Board minimax(Board currentBoard, int depth, boolean optionalCapture){
 
         //sleep thread for a second to allow user to see moves more easily
         try {
@@ -507,21 +504,23 @@ public class GameActivity extends AppCompatActivity {
         } catch (InterruptedException e) { //if interrupted, not really important, just carry on
         }
 
-        Board[] availableMoves = currentBoard.findMoves(isBlack, optionalCapture); //find all the moves available to the player
+        Board[] availableMoves = currentBoard.findMoves(false, optionalCapture); //find all the moves available to the player
 
         Board bestMove = new Board(); //the best possible move
         bestMove.nullBoard(); //if no moves are available, this empty board will be returned and the Game will recognise this as a surrender
         double bestScore; //the value of the best possible move
         double currentScore; //the value of the current move
 
-        if (isBlack) { //if player is black, high scores are good, so default score is as low as possible
-            bestScore = Double.NEGATIVE_INFINITY;
-        } else { //if player white, low scores are good, so default score is as high as possible
-            bestScore = Double.POSITIVE_INFINITY;
-        }
+        bestScore = Double.POSITIVE_INFINITY;
+
         int count = 0;
         if (optionalCapture){
             depth -= 1;
+        }
+        int piecesLeft = currentBoard.allCount(0b1111111111111111111111111111111111111111111111L);
+        if (piecesLeft < 10){
+            depth += 5 ;
+            depth -= piecesLeft/2; //with fewer pieces, search more layers deep
         }
         for (Board currentMove : availableMoves) { //for each move in the list of possible moves
             Message msg = handler.obtainMessage();
@@ -530,12 +529,13 @@ public class GameActivity extends AppCompatActivity {
             bundle.putFloat("progress", progress); //tell handler done
             msg.setData(bundle);
             handler.sendMessage(msg); //send progress update to handler
-            currentScore = marvin.minimaxV3(currentMove, isBlack, depth-1, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
-            if ((isBlack && currentScore > bestScore) || (!isBlack && currentScore < bestScore)){ //if current move is better than all before it (or worse if you're white)
+            currentScore = hal.minimaxV3(currentMove, true, depth-1, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
+            if (currentScore < bestScore){ //if current move is better than all before it
                 bestScore = currentScore; //set best score to score of current move
                 bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)
             }
             count++;
+            System.out.println(currentScore);
         }
         Message msg = handler.obtainMessage();
         Bundle bundle = new Bundle();

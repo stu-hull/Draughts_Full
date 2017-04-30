@@ -1,6 +1,7 @@
 package com.example.stuart.draughts;
 
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Created by Stuart on 30/08/2016.
@@ -13,14 +14,6 @@ class Ai {
 
     Ai(Boolean optionalCapture){
         this.optionalCapture = optionalCapture;
-    }
-
-    public static void main(String[] args){
-        Ai marvin = new Ai(false);
-        for (int i = 0; i < 7; i++) {
-            marvin.minimaxV3(new Board(), false, 15, -Double.MAX_VALUE, Double.MAX_VALUE);
-        }
-        System.out.println("Done");
     }
 
 
@@ -155,7 +148,7 @@ class Ai {
     //If at 9 plies it is in the middle of a capture, this version will keep searching a move until the capture sequence is complete
     double minimaxV3(Board board, boolean isBlack, int depth, double alpha, double beta){
         if (depth == 0){
-            return heuristicV2(board);
+            return heuristicV3(board);
         }
 
         Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
@@ -384,6 +377,8 @@ class Ai {
     private static final float centerValue = 20; //pieces in the center are worth x more than base value
     private static final float ratioConstant = 0; //changes the weight of a difference in piece count
     private static final float freePiece = 70; //pieces past all opposition which are guaranteed to become kings
+    private static final float counterAdvance = 10; //the extra value a piece has for making it further across the board
+    private static final float ultimateConstant = (float) 0.0000000001; //the weight given to the average progress of each player's counters
 
     //Version 1 of the heuristic algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Ideas: incentives to keep back row intact, control central 8 squares, and get kings; value a piece difference greater with fewer pieces on board; blocking option?
@@ -454,6 +449,74 @@ class Ai {
                 score -= freePiece;
             }
         }
+
+        return score;
+
+    } //DONE //TESTED
+
+    static double heuristicV3(Board board){
+
+        double score = 0;
+
+        score += Long.bitCount(board.getBlackPieces()) * baseValue;
+        score -= Long.bitCount(board.getWhitePieces()) * baseValue;
+
+        score += Long.bitCount(board.blackKings()) * kingValue;
+        score -= Long.bitCount(board.whiteKings()) * kingValue;
+
+        score += board.blackCount(Board.maskBlackBack) * backValue;
+        score -= board.whiteCount(Board.maskWhiteBack) * backValue;
+
+        score += board.blackCount(Board.maskCenter) * centerValue;
+        score -= board.whiteCount(Board.maskCenter) * centerValue;
+
+        if (board.blackCount(Board.maskValid) >= board.whiteCount(Board.maskValid)) {
+            score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of white+constant : black+constant
+            score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
+        } else {
+            score *= (Long.bitCount(board.getWhitePieces()) + ratioConstant); //multiply the score by the ratio of white+constant : black+constant
+            score /= (Long.bitCount(board.getBlackPieces()) + ratioConstant);
+        }
+
+        /*
+        for (int position = 40; position > 4; position--) { //count back board positions
+            if (board.isPlayer2(position)){ //keep going until a player2 piece is reached
+                break;
+            } else if (board.isPlayer1(position)){ //if player1, piece has gotten past all opposition
+                score += freePiece;
+            }
+        }
+        for (int position = 5; position < 41; position++) { //count up board positions
+            if (board.isPlayer1(position)){ //keep going until a player1 piece is reached
+                break;
+            } else if (board.isPlayer2(position)){ //if player2, piece has gotten past all opposition
+                score -= freePiece;
+            }
+        }
+        */
+
+        /*
+        //if counter has advanced, it's worth more (it took turns to advance it)
+        for (int position = 5; position < 41; position ++){
+            if (board.isPlayer1(position)){
+                score += (int)((2*position)/9) * counterAdvance;
+            } else if (board.isPlayer2(position)){
+                score -= (int)((9 - 2*position)/9) * counterAdvance;
+            }
+        }
+        */
+
+        long flippedWhites = Long.reverse(board.getWhitePieces()) >> 18;
+        score += (board.getBlackPieces() - flippedWhites) * ultimateConstant;
+        /*
+        Random r = new Random();
+        if (r.nextFloat() < 0.0001){
+            System.out.println("This is printing");
+            System.out.println(board.getBlackPieces());
+            System.out.println(flippedWhites);
+            System.out.println((board.getBlackPieces() - flippedWhites) * ultimateConstant);
+        }
+        */
 
         return score;
 

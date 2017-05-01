@@ -321,7 +321,7 @@ public class GameActivity extends AppCompatActivity {
                     if (!game.isPlayer1Turn() && game.isAgainstComputer()) {
                         Runnable runnable = new Runnable() { //setup new thread
                             public void run() {
-                                game.setCurrentBoard(minimax(game.getCurrentBoard() , 8, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
+                                game.setCurrentBoard(minimax(game.getCurrentBoard() , 9, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
                             }
                         };
                         myThread = new Thread(runnable); //run thread
@@ -513,15 +513,21 @@ public class GameActivity extends AppCompatActivity {
 
         bestScore = Double.POSITIVE_INFINITY;
 
+        if (currentBoard.getKings() != 0){
+            hal.factor = false;
+        }
+
         int count = 0;
         if (optionalCapture){
             depth -= 1;
         }
         int piecesLeft = currentBoard.allCount(0b1111111111111111111111111111111111111111111111L);
-        if (piecesLeft < 10){
-            depth += 5 ;
-            depth -= piecesLeft/2; //with fewer pieces, search more layers deep
+        if (piecesLeft < 6){
+            depth += 2 ;
+            depth -= piecesLeft/3; //with fewer pieces, search more layers deep
         }
+        System.out.println(piecesLeft);
+        System.out.println(depth);
         for (Board currentMove : availableMoves) { //for each move in the list of possible moves
             Message msg = handler.obtainMessage();
             Bundle bundle = new Bundle();
@@ -529,7 +535,7 @@ public class GameActivity extends AppCompatActivity {
             bundle.putFloat("progress", progress); //tell handler done
             msg.setData(bundle);
             handler.sendMessage(msg); //send progress update to handler
-            currentScore = hal.minimaxV3(currentMove, true, depth-1, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
+            currentScore = hal.minimaxV2(currentMove, true, depth-1, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
             if (currentScore < bestScore){ //if current move is better than all before it
                 bestScore = currentScore; //set best score to score of current move
                 bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)

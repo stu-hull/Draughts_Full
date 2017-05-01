@@ -1,7 +1,6 @@
 package com.example.stuart.draughts;
 
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  * Created by Stuart on 30/08/2016.
@@ -11,9 +10,11 @@ import java.util.Random;
 class Ai {
 
     private Boolean optionalCapture;
+    boolean factor; //specifies whether extra code in heuristicV3 should be run
 
     Ai(Boolean optionalCapture){
         this.optionalCapture = optionalCapture;
+        factor = true;
     }
 
 
@@ -95,7 +96,7 @@ class Ai {
     //This version can reach 9 plies slightly faster than V1 reaches 7 plies, which makes sense (7 * 4/3 = 9.3333)
     double minimaxV2(Board board, boolean isBlack, int depth, double alpha, double beta){
         if (depth == 0){
-            return heuristicV2(board);
+            return heuristicV3(board);
         }
 
         Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
@@ -120,6 +121,10 @@ class Ai {
                     }
                 }
             }
+            //reward faster wins by decreasing a winning value the more moves it takes
+            if (bestScore > Double.MAX_VALUE-20){
+                return bestScore - 1;
+            }
             return bestScore;
 
         } else {
@@ -139,6 +144,11 @@ class Ai {
                     }
                 }
             }
+
+            //reward faster wins by decreasing a winning value the more moves it takes
+            if (bestScore < -Double.MAX_VALUE+20){
+                return bestScore + 1;
+            }
             return bestScore;
         }
 
@@ -148,7 +158,7 @@ class Ai {
     //If at 9 plies it is in the middle of a capture, this version will keep searching a move until the capture sequence is complete
     double minimaxV3(Board board, boolean isBlack, int depth, double alpha, double beta){
         if (depth == 0){
-            return heuristicV3(board);
+            return heuristicV1(board);
         }
 
         Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
@@ -212,7 +222,7 @@ class Ai {
     //Not really considered a success, slows the program down for the most part
     double minimaxV4(Board board, boolean isBlack, int depth, double alpha, double beta){
         if (depth == 0){
-            return heuristicV2(board);
+            return heuristicV1(board);
         }
 
         Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
@@ -319,7 +329,7 @@ class Ai {
                 for (int i = 0; i < availableMoves.length; i++) { //iterate through available moves
                     Board move = availableMoves[i];
 
-                    currentScore = minimaxV3(move, !isBlack, d-1, tempAlpha, beta); //minimax for result
+                    currentScore = minimaxV5(move, !isBlack, d-1, tempAlpha, beta); //minimax for result
 
                     if (currentScore > bestScore) {
                         bestScore = currentScore;
@@ -347,7 +357,7 @@ class Ai {
                 for (int i = 0; i < availableMoves.length; i++) {
                     Board move = availableMoves[i];
 
-                    currentScore = minimaxV3(move, !isBlack, d-1, alpha, tempBeta);
+                    currentScore = minimaxV5(move, !isBlack, d-1, alpha, tempBeta);
 
                     if (currentScore < bestScore) {
                         bestScore = currentScore;
@@ -454,7 +464,7 @@ class Ai {
 
     } //DONE //TESTED
 
-    static double heuristicV3(Board board){
+    double heuristicV3(Board board){
 
         double score = 0;
 
@@ -478,45 +488,10 @@ class Ai {
             score /= (Long.bitCount(board.getBlackPieces()) + ratioConstant);
         }
 
-        /*
-        for (int position = 40; position > 4; position--) { //count back board positions
-            if (board.isPlayer2(position)){ //keep going until a player2 piece is reached
-                break;
-            } else if (board.isPlayer1(position)){ //if player1, piece has gotten past all opposition
-                score += freePiece;
-            }
+        if (factor) {
+            long flippedBlacks = Long.reverse(board.getBlackPieces()) >> 18;
+            score += (flippedBlacks - board.getWhitePieces()) * ultimateConstant;
         }
-        for (int position = 5; position < 41; position++) { //count up board positions
-            if (board.isPlayer1(position)){ //keep going until a player1 piece is reached
-                break;
-            } else if (board.isPlayer2(position)){ //if player2, piece has gotten past all opposition
-                score -= freePiece;
-            }
-        }
-        */
-
-        /*
-        //if counter has advanced, it's worth more (it took turns to advance it)
-        for (int position = 5; position < 41; position ++){
-            if (board.isPlayer1(position)){
-                score += (int)((2*position)/9) * counterAdvance;
-            } else if (board.isPlayer2(position)){
-                score -= (int)((9 - 2*position)/9) * counterAdvance;
-            }
-        }
-        */
-
-        long flippedWhites = Long.reverse(board.getWhitePieces()) >> 18;
-        score += (board.getBlackPieces() - flippedWhites) * ultimateConstant;
-        /*
-        Random r = new Random();
-        if (r.nextFloat() < 0.0001){
-            System.out.println("This is printing");
-            System.out.println(board.getBlackPieces());
-            System.out.println(flippedWhites);
-            System.out.println((board.getBlackPieces() - flippedWhites) * ultimateConstant);
-        }
-        */
 
         return score;
 

@@ -56,6 +56,22 @@ public class Settings extends AppCompatActivity {
             intent.putExtra("defaultColours", true); //if both chosen same, set colours to default
         }
 
+        RadioButton difficultyEasy = (RadioButton) findViewById(R.id.difficultyEasy);
+        RadioButton difficultyMedium = (RadioButton) findViewById(R.id.difficultyMedium);
+        RadioButton difficultyHard = (RadioButton) findViewById(R.id.difficultyHard);
+        RadioButton difficultyHAL = (RadioButton) findViewById(R.id.difficultyHAL);
+        if (difficultyEasy.isChecked()){
+            intent.putExtra("difficulty", 0);
+        } else if (difficultyMedium.isChecked()){
+            intent.putExtra("difficulty", 1);
+        } else if (difficultyHard.isChecked()){
+            intent.putExtra("difficulty", 2);
+        } else if (difficultyHAL.isChecked()){
+            intent.putExtra("difficulty", 3);
+        } else {
+            intent.putExtra("difficulty", 1);
+        }
+
         setResult(RESULT_OK, intent);
         super.finish();
     }

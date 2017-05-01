@@ -122,8 +122,8 @@ class Ai {
                 }
             }
             //reward faster wins by decreasing a winning value the more moves it takes
-            if (bestScore > Double.MAX_VALUE-20){
-                return bestScore - 1;
+            if (bestScore == Double.MAX_VALUE){
+                return bestScore * 0.99;
             }
             return bestScore;
 
@@ -146,8 +146,8 @@ class Ai {
             }
 
             //reward faster wins by decreasing a winning value the more moves it takes
-            if (bestScore < -Double.MAX_VALUE+20){
-                return bestScore + 1;
+            if (bestScore == -Double.MAX_VALUE){
+                return bestScore * 0.99;
             }
             return bestScore;
         }

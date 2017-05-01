@@ -70,7 +70,6 @@ class Game{
             currentBoard = newBoard;
             player1Turn = !player1Turn;
             legalMoves = currentBoard.findMoves(player1Turn, optionalCapture);
-            System.out.println(Ai.heuristicV2(currentBoard));
         }
     }
 

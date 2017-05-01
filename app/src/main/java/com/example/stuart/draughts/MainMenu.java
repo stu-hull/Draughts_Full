@@ -12,6 +12,7 @@ public class MainMenu extends AppCompatActivity {
     Boolean optionalCapture;
     int player1Colour;
     int player2Colour;
+    int difficulty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +21,7 @@ public class MainMenu extends AppCompatActivity {
         againstComputer = false;
         player1Colour = 1;
         player2Colour = 0;
+        difficulty = 1;
     }
 
     //Runs when "Start Game" button on home screen is pressed- starts game activity, passes settings to activity
@@ -29,6 +31,7 @@ public class MainMenu extends AppCompatActivity {
         intent.putExtra("optionalCapture", optionalCapture);
         intent.putExtra("player1Colour", player1Colour);
         intent.putExtra("player2Colour", player2Colour);
+        intent.putExtra("difficulty", difficulty);
         startActivity(intent);
     }
 
@@ -51,6 +54,7 @@ public class MainMenu extends AppCompatActivity {
                     player1Colour = data.getExtras().getInt("player1Colour", 1);
                     player2Colour = data.getExtras().getInt("player2Colour", 0);
                 }
+                difficulty = data.getExtras().getInt("difficulty");
             }
         }
     }

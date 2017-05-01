@@ -20,10 +20,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Arrays;
+import java.util.Random;
+
 public class GameActivity extends AppCompatActivity {
 
     public Game game;
     private Ai hal;
+    private int difficulty;
     RelativeLayout layout;
 
     //details about screen dimensions
@@ -215,6 +219,7 @@ public class GameActivity extends AppCompatActivity {
         game = new Game(againstComputer, optionalCapture);
         if (againstComputer){
             hal = new Ai(optionalCapture);
+            difficulty = getIntent().getIntExtra("difficulty", 1);
         }
 
         //set up counter images
@@ -266,7 +271,6 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            System.out.println(game.isPlayer1Turn());
             if (!inGame) { //if the game has ended, return to main menu upon touch
                 finish();
 
@@ -375,8 +379,6 @@ public class GameActivity extends AppCompatActivity {
         if (game.isAgainstComputer() && !(game.isPlayer1Turn())){
             throw new IllegalStateException("userInput called when no user input is required");
         }
-        System.out.println(game.isPlayer1Turn());
-        System.out.println(game.getCurrentBoard().isPlayer1(bit));
         if (highlighted == -1){ //if nothing highlighted
             if (!(game.getCurrentBoard().isEmpty(bit)) && (game.getCurrentBoard().isPlayer1(bit) == game.isPlayer1Turn())){ //if tapped on counter and counter is right colour, highlight counter
                 highlighted = bit;
@@ -400,6 +402,7 @@ public class GameActivity extends AppCompatActivity {
                         }
                     } else if (newBoard.kingCount(Board.maskValid) > game.getCurrentBoard().kingCount(Board.maskValid)){ //else if piece became a king, make move and reset regardless
                         highlighted = -1;
+                        game.inMultiJump = false;
                         game.saveGame();
                         return newBoard;
                     } else {
@@ -504,53 +507,143 @@ public class GameActivity extends AppCompatActivity {
         } catch (InterruptedException e) { //if interrupted, not really important, just carry on
         }
 
-        Board[] availableMoves = currentBoard.findMoves(false, optionalCapture); //find all the moves available to the player
-
-        Board bestMove = new Board(); //the best possible move
-        bestMove.nullBoard(); //if no moves are available, this empty board will be returned and the Game will recognise this as a surrender
-        double bestScore; //the value of the best possible move
-        double currentScore; //the value of the current move
-
-        bestScore = Double.POSITIVE_INFINITY;
-
+        //if there are kings on the board, disable the additional code in the heuristic
         if (currentBoard.getKings() != 0){
             hal.factor = false;
         }
-
-        int count = 0;
+        //optional capture takes more resources, one less layer seems to make it take the same time
         if (optionalCapture){
             depth -= 1;
         }
+        //if there are fewer pieces left, increase the depth to search
         int piecesLeft = currentBoard.allCount(0b1111111111111111111111111111111111111111111111L);
-        if (piecesLeft < 6){
-            depth += 2 ;
-            depth -= piecesLeft/3; //with fewer pieces, search more layers deep
+        if (piecesLeft < 4){
+            depth += 1 ;
         }
-        System.out.println(piecesLeft);
-        System.out.println(depth);
-        for (Board currentMove : availableMoves) { //for each move in the list of possible moves
-            Message msg = handler.obtainMessage();
-            Bundle bundle = new Bundle();
-            float progress =  count*100/availableMoves.length;
-            bundle.putFloat("progress", progress); //tell handler done
-            msg.setData(bundle);
-            handler.sendMessage(msg); //send progress update to handler
-            currentScore = hal.minimaxV2(currentMove, true, depth-1, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
-            if (currentScore < bestScore){ //if current move is better than all before it
-                bestScore = currentScore; //set best score to score of current move
-                bestMove = currentMove; //record the current move to be returned (this is the bit the other algorithm won't do)
-            }
+        //adjust depth to account for difficulty
+        depth -= 3;
+        depth += difficulty;
+
+        Board[] availableMoves = currentBoard.findMoves(false, optionalCapture); //find all the moves available to the player
+        double[] moveValues = new double[availableMoves.length];
+
+        //if no moves are available, this empty board will be returned and the Game will recognise this as a surrender
+        if (availableMoves.length == 0){
+            Board b = new Board();
+            b.nullBoard();
+            return b;
+        }
+
+        int count = 0;
+        for (int i=0; i<availableMoves.length; i++) { //for each move in the list of possible moves
+            sendMessage(count*100/availableMoves.length);
+            Board currentMove = availableMoves[i];
+            moveValues[i] = hal.minimaxV2(currentMove, true, depth-1, -Double.MAX_VALUE, Double.MAX_VALUE); //score of current move is found with minimax
             count++;
-            System.out.println(currentScore);
+            System.out.println(moveValues[i]);
         }
+
+        //sort the moves in order of value
+        selectionSort(moveValues, availableMoves);
+        System.out.println(Arrays.toString(moveValues));
+        sendMessage(100);
+
+        //difficulty adjustment
+        float proportion;
+        switch (difficulty){
+            case 3: return availableMoves[0];
+            case 2:
+                if (optionalCapture){
+                    proportion = (float) 0.10;
+                } else {
+                    proportion = (float) 0.13;
+                }
+                break;
+            case 1:
+                if (optionalCapture){
+                    proportion = (float) 0.17;
+                } else {
+                    proportion = (float) 0.3;
+                }
+                break;
+            case 0:
+                if (optionalCapture){
+                    proportion = (float) 0.3;
+                } else {
+                    proportion = (float) 0.6;
+                }
+                break;
+            default:
+                proportion = 1;
+        }
+
+        int movesConsidered = (int)(proportion * moveValues.length + 1);
+        Random r = new Random();
+        int moveChosen = r.nextInt(movesConsidered);
+        if (moveChosen != 0){
+            System.out.println("The AI was NOT optimal");
+        } else {
+            System.out.println("The AI was optimal");
+        }
+        return availableMoves[moveChosen];
+
+        /*
+        //creates a spinner out of moveValues, based on powers
+        double total = 0;
+        for (int i=0; i<moveValues.length; i++){
+            moveValues[i] = Math.pow(base, -moveValues[i]);
+            total += moveValues[i];
+        }
+        System.out.println(Arrays.toString(moveValues));
+        Random r = new Random();
+        float result = (float) (r.nextFloat()*total); //spin the spinner
+        double runningTotal = 0;
+        for (int i=0; i<moveValues.length; i++){
+            runningTotal += moveValues[i];
+            if (result < runningTotal){
+                System.out.print("Move chosen: "); System.out.println(i);
+                return availableMoves[i];
+            }
+        }
+
+        return null;
+        */
+    } //DONE //TESTED
+
+    //does a simple selection sort, highest-first. Takes a key array and a data array, and sorts both based on the key values.
+    private void selectionSort(double[] keyArray, Board[] dataArray){
+        for (int i=0; i<keyArray.length; i++){
+            for (int j=i; j<keyArray.length; j++){
+                if (keyArray[j] < keyArray[i]){
+                    swap(keyArray, dataArray, i, j);
+                }
+            }
+        }
+    }
+    private void swap (double[] keyArray, Board[] dataArray, int i, int j){
+        double holdKey = keyArray[i];
+        Board holdData = dataArray[i];
+        keyArray[i] = keyArray[j];
+        dataArray[i] = dataArray[j];
+        keyArray[j] = holdKey;
+        dataArray[j] = holdData;
+    }
+
+    //squishes a value between 1 and -1
+    private double squish (double value){
+        if (value > 0){
+            return value / (1 + value);
+        } else {
+            return value / (1 - value);
+        }
+    }
+
+    private void sendMessage(float progress){
         Message msg = handler.obtainMessage();
         Bundle bundle = new Bundle();
-        float progress =  count*100/availableMoves.length;
         bundle.putFloat("progress", progress); //tell handler done
         msg.setData(bundle);
         handler.sendMessage(msg);
-
-        return bestMove;
-    } //DONE //TESTED
+    }
 
 }

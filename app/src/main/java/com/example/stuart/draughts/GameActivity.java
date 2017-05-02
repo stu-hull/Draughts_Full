@@ -527,7 +527,7 @@ public class GameActivity extends AppCompatActivity {
         Board[] availableMoves = currentBoard.findMoves(false, optionalCapture); //find all the moves available to the player
         double[] moveValues = new double[availableMoves.length];
 
-        //if no moves are available, this empty board will be returned and the Game will recognise this as a surrender
+        //if no moves are available, empty board will be returned and the Game will recognise this as a surrender
         if (availableMoves.length == 0){
             Board b = new Board();
             b.nullBoard();
@@ -551,17 +551,17 @@ public class GameActivity extends AppCompatActivity {
         //difficulty adjustment
         float proportion;
         switch (difficulty){
-            case 3: return availableMoves[0];
+            case 3: return availableMoves[0]; //if in HAL mode, always return best move
             case 2:
                 if (optionalCapture){
-                    proportion = (float) 0.10;
+                    proportion = (float) 0.11; //proportion of best moves that will be considered
                 } else {
-                    proportion = (float) 0.13;
+                    proportion = (float) 0.14;
                 }
                 break;
             case 1:
                 if (optionalCapture){
-                    proportion = (float) 0.17;
+                    proportion = (float) 0.18;
                 } else {
                     proportion = (float) 0.3;
                 }
@@ -580,11 +580,6 @@ public class GameActivity extends AppCompatActivity {
         int movesConsidered = (int)(proportion * moveValues.length + 1);
         Random r = new Random();
         int moveChosen = r.nextInt(movesConsidered);
-        if (moveChosen != 0){
-            System.out.println("The AI was NOT optimal");
-        } else {
-            System.out.println("The AI was optimal");
-        }
         return availableMoves[moveChosen];
 
         /*

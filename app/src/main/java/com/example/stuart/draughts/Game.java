@@ -20,7 +20,6 @@ class Game{
     //boolean variables for details of the game
     private boolean againstComputer; //is it against AI or 2 player
     private boolean optionalCapture;
-    private boolean player1Black; //is player 1 black
     private boolean player1Turn; //is it player 1's turn
 
     private Game previousGameState; //previous game state to undo from
@@ -44,9 +43,6 @@ class Game{
     boolean isOptionalCapture() {
         return optionalCapture;
     }
-    boolean isPlayer1Black() {
-        return player1Black;
-    }
     boolean isPlayer1Turn() {
         return player1Turn;
     }
@@ -55,15 +51,14 @@ class Game{
     }
 
     //constructor sets up initial details of the game and displays them
-    Game(boolean againstComputer, boolean player1Black, boolean optionalCapture) {
+    Game(boolean againstComputer, boolean optionalCapture) {
         this.againstComputer = againstComputer; //is the game against the computer? Which player is black?
-        this.player1Black = player1Black;
         this.optionalCapture = optionalCapture;
+        player1Turn = true;
 
         //create the board; first player to move is black
         currentBoard = new Board();
         legalMoves = currentBoard.findMoves(true, optionalCapture);
-        player1Turn = player1Black;
     }
 
     //update currentBoard
@@ -74,14 +69,13 @@ class Game{
         } else {
             currentBoard = newBoard;
             player1Turn = !player1Turn;
-            legalMoves = currentBoard.findMoves(player1Turn == player1Black, optionalCapture);
-            System.out.println(Ai.heuristicV2(currentBoard));
+            legalMoves = currentBoard.findMoves(player1Turn, optionalCapture);
         }
     }
 
     //save current game state to undo to
     void saveGame(){
-        previousGameState = new Game(againstComputer, true, optionalCapture); //copy game into previousGameState
+        previousGameState = new Game(againstComputer, optionalCapture); //copy game into previousGameState
         previousGameState.currentBoard.copyBoard(this.currentBoard); //copyBoard acts as a deepcopy for Board objects
         previousGameState.legalMoves = new Board[this.legalMoves.length];
         for (int i=0; i < this.legalMoves.length; i++){ //Iterate through legalMoves, copyBoarding each into previousGameState

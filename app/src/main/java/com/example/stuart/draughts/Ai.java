@@ -10,17 +10,11 @@ import java.util.HashMap;
 class Ai {
 
     private Boolean optionalCapture;
+    boolean factor; //specifies whether extra code in heuristicV3 should be run
 
     Ai(Boolean optionalCapture){
         this.optionalCapture = optionalCapture;
-    }
-
-    public static void main(String[] args){
-        Ai marvin = new Ai(false);
-        for (int i = 0; i < 7; i++) {
-            marvin.minimaxV3(new Board(), false, 15, -Double.MAX_VALUE, Double.MAX_VALUE);
-        }
-        System.out.println("Done");
+        factor = true;
     }
 
 
@@ -102,7 +96,7 @@ class Ai {
     //This version can reach 9 plies slightly faster than V1 reaches 7 plies, which makes sense (7 * 4/3 = 9.3333)
     double minimaxV2(Board board, boolean isBlack, int depth, double alpha, double beta){
         if (depth == 0){
-            return heuristicV2(board);
+            return heuristicV3(board);
         }
 
         Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
@@ -127,6 +121,10 @@ class Ai {
                     }
                 }
             }
+            //reward faster wins by decreasing a winning value the more moves it takes
+            if (bestScore == Double.MAX_VALUE){
+                return bestScore * 0.99;
+            }
             return bestScore;
 
         } else {
@@ -146,6 +144,11 @@ class Ai {
                     }
                 }
             }
+
+            //reward faster wins by decreasing a winning value the more moves it takes
+            if (bestScore == -Double.MAX_VALUE){
+                return bestScore * 0.99;
+            }
             return bestScore;
         }
 
@@ -155,7 +158,7 @@ class Ai {
     //If at 9 plies it is in the middle of a capture, this version will keep searching a move until the capture sequence is complete
     double minimaxV3(Board board, boolean isBlack, int depth, double alpha, double beta){
         if (depth == 0){
-            return heuristicV2(board);
+            return heuristicV1(board);
         }
 
         Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
@@ -219,7 +222,7 @@ class Ai {
     //Not really considered a success, slows the program down for the most part
     double minimaxV4(Board board, boolean isBlack, int depth, double alpha, double beta){
         if (depth == 0){
-            return heuristicV2(board);
+            return heuristicV1(board);
         }
 
         Board[] availableMoves = board.findMoves(isBlack, optionalCapture);
@@ -326,7 +329,7 @@ class Ai {
                 for (int i = 0; i < availableMoves.length; i++) { //iterate through available moves
                     Board move = availableMoves[i];
 
-                    currentScore = minimaxV3(move, !isBlack, d-1, tempAlpha, beta); //minimax for result
+                    currentScore = minimaxV5(move, !isBlack, d-1, tempAlpha, beta); //minimax for result
 
                     if (currentScore > bestScore) {
                         bestScore = currentScore;
@@ -354,7 +357,7 @@ class Ai {
                 for (int i = 0; i < availableMoves.length; i++) {
                     Board move = availableMoves[i];
 
-                    currentScore = minimaxV3(move, !isBlack, d-1, alpha, tempBeta);
+                    currentScore = minimaxV5(move, !isBlack, d-1, alpha, tempBeta);
 
                     if (currentScore < bestScore) {
                         bestScore = currentScore;
@@ -384,6 +387,8 @@ class Ai {
     private static final float centerValue = 20; //pieces in the center are worth x more than base value
     private static final float ratioConstant = 0; //changes the weight of a difference in piece count
     private static final float freePiece = 70; //pieces past all opposition which are guaranteed to become kings
+    private static final float counterAdvance = 10; //the extra value a piece has for making it further across the board
+    private static final float ultimateConstant = (float) 0.0000000001; //the weight given to the average progress of each player's counters
 
     //Version 1 of the heuristic algorithm, this version will likely be replaced for greater efficiency and/or accuracy
     //Ideas: incentives to keep back row intact, control central 8 squares, and get kings; value a piece difference greater with fewer pieces on board; blocking option?
@@ -453,6 +458,39 @@ class Ai {
             } else if (board.isPlayer2(position)){ //if player2, piece has gotten past all opposition
                 score -= freePiece;
             }
+        }
+
+        return score;
+
+    } //DONE //TESTED
+
+    double heuristicV3(Board board){
+
+        double score = 0;
+
+        score += Long.bitCount(board.getBlackPieces()) * baseValue;
+        score -= Long.bitCount(board.getWhitePieces()) * baseValue;
+
+        score += Long.bitCount(board.blackKings()) * kingValue;
+        score -= Long.bitCount(board.whiteKings()) * kingValue;
+
+        score += board.blackCount(Board.maskBlackBack) * backValue;
+        score -= board.whiteCount(Board.maskWhiteBack) * backValue;
+
+        score += board.blackCount(Board.maskCenter) * centerValue;
+        score -= board.whiteCount(Board.maskCenter) * centerValue;
+
+        if (board.blackCount(Board.maskValid) >= board.whiteCount(Board.maskValid)) {
+            score *= (Long.bitCount(board.getBlackPieces()) + ratioConstant); //multiply the score by the ratio of white+constant : black+constant
+            score /= (Long.bitCount(board.getWhitePieces()) + ratioConstant);
+        } else {
+            score *= (Long.bitCount(board.getWhitePieces()) + ratioConstant); //multiply the score by the ratio of white+constant : black+constant
+            score /= (Long.bitCount(board.getBlackPieces()) + ratioConstant);
+        }
+
+        if (factor) {
+            long flippedBlacks = Long.reverse(board.getBlackPieces()) >> 18;
+            score += (flippedBlacks - board.getWhitePieces()) * ultimateConstant;
         }
 
         return score;

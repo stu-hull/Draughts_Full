@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_settings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -11,99 +12,143 @@
     tools:context="com.example.stuart.draughts.Settings"
     android:background="@color/background">
 
+    <Switch
+        android:text="@string/computer_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textOn="@string/computer_on"
+        android:textOff="@string/computer_off"
+        android:layout_marginTop="15dp"
+        android:switchPadding="10dp"
+        android:id="@+id/computer_toggle"/>
+
+    <Switch
+        android:text="@string/compulsoryCapture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textOn="@string/compulsoryOn"
+        android:textOff="@string/compulsoryOff"
+        android:layout_marginTop="5dp"
+        android:switchPadding="10dp"
+        android:id="@+id/compulsoryToggle"/>
+
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="47dp">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <Switch
-            android:text="@string/computer_toggle"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textOn="@string/computer_on"
-            android:textOff="@string/computer_off"
-            android:layout_marginTop="15dp"
-            android:switchPadding="10dp"
-            android:id="@+id/computer_toggle"/>
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                android:text="@string/player1ColourLabel"
+                android:textSize="@dimen/playerColourLabelSize"/>
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:text="@string/playerWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/player1White"/>
+                <RadioButton
+                    android:text="@string/playerRed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/player1Red"/>
+                <RadioButton
+                    android:text="@string/playerBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/player1Black"/>
+            </RadioGroup>
+        </LinearLayout>
 
-        <Switch
-            android:text="@string/compulsoryCapture"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textOn="@string/compulsoryOn"
-            android:textOff="@string/compulsoryOff"
-            android:layout_marginTop="5dp"
-            android:switchPadding="10dp"
-            android:id="@+id/compulsoryToggle"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:text="@string/player1ColourLabel"
-            android:textSize="@dimen/playerColourLabelSize"/>
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:text="@string/playerWhite"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:id="@+id/player1White"/>
-            <RadioButton
-                android:text="@string/playerRed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/player1Red"/>
-            <RadioButton
-                android:text="@string/playerBlack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/player1Black"/>
-        </RadioGroup>
-
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:text="@string/player2ColourLabel"
-            android:textSize="@dimen/playerColourLabelSize"/>
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:text="@string/playerWhite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/player2White"/>
-            <RadioButton
-                android:text="@string/playerRed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/player2Red"/>
-            <RadioButton
-                android:text="@string/playerBlack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/player2Black"/>
-        </RadioGroup>
-
-
+                android:layout_marginTop="15dp"
+                android:text="@string/player2ColourLabel"
+                android:textSize="@dimen/playerColourLabelSize"/>
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:text="@string/playerWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/player2White"/>
+                <RadioButton
+                    android:text="@string/playerRed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/player2Red"/>
+                <RadioButton
+                    android:text="@string/playerBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/player2Black"/>
+            </RadioGroup>
+        </LinearLayout>
 
     </LinearLayout>
 
-</RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:text="@string/difficultyLabel"
+        android:textSize="@dimen/difficultyLabelSize"/>
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+            android:text="@string/difficultyEasy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/difficultyEasy"/>
+        <RadioButton
+            android:text="@string/difficultyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/difficultyMedium"/>
+        <RadioButton
+            android:text="@string/difficultyHard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/difficultyHard"/>
+        <RadioButton
+            android:text="@string/difficultyHAL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/difficultyHAL"/>
+    </RadioGroup>
+
+
+</LinearLayout>
+

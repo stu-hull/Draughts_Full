@@ -36,6 +36,11 @@
     <string name="compulsoryCapture">Optional Captures</string>
     <string name="compulsoryOn">on</string>
     <string name="compulsoryOff">off</string>
+    <string name="difficultyEasy">Easy</string>
+    <string name="difficultyMedium">Medium</string>
+    <string name="difficultyHard">Hard</string>
+    <string name="difficultyHAL">HAL 9000</string>
+    <string name="difficultyLabel">Computer Difficulty</string>
 
 
 </resources>

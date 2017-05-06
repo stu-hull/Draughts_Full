@@ -6,4 +6,9 @@
     <dimen name="turnLabelTextSize">30sp</dimen>
     <dimen name="playerColourLabelSize">15sp</dimen>
     <dimen name="difficultyLabelSize">15sp</dimen>
+    <dimen name="settings_text_size">35dp</dimen>
+    <dimen name="colour_same_error_size">15sp</dimen>
+    <dimen name="standard_margin">20dp</dimen>
+    <dimen name="small_margin">12dp</dimen>
+    <dimen name="large_margin">30dp</dimen>
 </resources>

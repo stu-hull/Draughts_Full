@@ -1,6 +1,4 @@
-package com.example.stuart.draughts;
-
-import java.util.Random;
+package com.Draughts2.stuart.draughts;
 
 /**
  * Created by Stuart on 30/08/2016.

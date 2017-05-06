@@ -1,4 +1,4 @@
-package com.example.stuart.draughts;
+package com.Draughts2.stuart.draughts;
 
 // ANNOTATION TERMINOLOGY:
 // Mover- a piece which can slide into an adjacent square

@@ -1,4 +1,4 @@
-package com.example.stuart.draughts;
+package com.Draughts2.stuart.draughts;
 
 import java.util.HashMap;
 

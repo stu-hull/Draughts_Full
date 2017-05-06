@@ -152,8 +152,7 @@
         android:textSize="@dimen/colour_same_error_size"
         android:textAlignment="center"
         android:textColor="@color/loseColour"
-        android:visibility="invisible"
-        android:layout_marginTop="@dimen/small_margin"/>
+        android:visibility="invisible" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -166,7 +165,7 @@
             android:layout_centerHorizontal="true"
             android:onClick="startGame"
             android:text="@string/start_game"
-            android:layout_marginTop="@dimen/standard_margin"/>
+            android:layout_marginTop="@dimen/small_margin"/>
 
     </RelativeLayout>
 

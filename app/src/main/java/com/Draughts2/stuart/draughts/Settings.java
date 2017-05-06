@@ -10,8 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -25,12 +25,17 @@ public class Settings extends AppCompatActivity {
 
     TextView difficultyLabel;
     RadioGroup difficultyGroup;
+    Boolean checked;
+
     LinearLayout layout;
+
     Spinner player1Spinner;
     Spinner player2Spinner;
+    ImageView player1image;
+    ImageView player2image;
     TextView warningMessage;
+
     Button startGame;
-    Boolean checked;
     Boolean goodToGo;
 
     Handler sleepCatch = new Handler(){
@@ -64,6 +69,11 @@ public class Settings extends AppCompatActivity {
         player1Spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                switch (player1Spinner.getSelectedItem().toString()){
+                    case "White": player1image.setImageResource(R.drawable.whiteman); break;
+                    case "Red": player1image.setImageResource(R.drawable.redman); break;
+                    case "Black": player1image.setImageResource(R.drawable.blackman); break;
+                }
                 checkIfSpinnersSame();
             }
             @Override
@@ -79,6 +89,11 @@ public class Settings extends AppCompatActivity {
         player2Spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                switch (player2Spinner.getSelectedItem().toString()){
+                    case "White": player2image.setImageResource(R.drawable.whiteman); break;
+                    case "Red": player2image.setImageResource(R.drawable.redman); break;
+                    case "Black": player2image.setImageResource(R.drawable.blackman); break;
+                }
                 checkIfSpinnersSame();
             }
             @Override
@@ -87,6 +102,11 @@ public class Settings extends AppCompatActivity {
             }
 
         });
+
+        player1image = (ImageView) findViewById(R.id.player_1_counter_image);
+        player2image = (ImageView) findViewById(R.id.player_2_counter_image);
+
+
 
         Switch computerOn = (Switch) findViewById(R.id.computer_toggle);
         computerOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
@@ -116,8 +136,6 @@ public class Settings extends AppCompatActivity {
             startGame.setClickable(true);
         }
     }
-
-
 
     //Runs when "Start Game" button on home screen is pressed- starts game activity, passes settings to activity
     public void startGame(View view) {

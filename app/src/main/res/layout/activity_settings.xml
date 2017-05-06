@@ -101,6 +101,12 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/player_1_colour_label"
                 android:textSize="@dimen/playerColourLabelSize"/>
+            <ImageView
+                android:layout_width="@dimen/sample_image_size"
+                android:layout_height="@dimen/sample_image_size"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/player_1_counter_image"
+                android:src="@drawable/redman" />
             <Spinner
                 android:id="@+id/player1ColourSpinner"
                 android:layout_width="wrap_content"
@@ -121,6 +127,12 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/player_2_colour_label"
                 android:textSize="@dimen/playerColourLabelSize" />
+            <ImageView
+                android:layout_width="@dimen/sample_image_size"
+                android:layout_height="@dimen/sample_image_size"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/player_2_counter_image"
+                android:src="@drawable/whiteman" />
             <Spinner
                 android:id="@+id/player2ColourSpinner"
                 android:layout_width="wrap_content"

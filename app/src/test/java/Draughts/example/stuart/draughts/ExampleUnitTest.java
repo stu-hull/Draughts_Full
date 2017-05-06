@@ -1,4 +1,4 @@
-package com.example.stuart.draughts;
+package Draughts.example.stuart.draughts;
 
 import org.junit.Test;
 

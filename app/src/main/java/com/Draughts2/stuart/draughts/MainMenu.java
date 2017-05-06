@@ -1,7 +1,6 @@
-package com.example.stuart.draughts;
+package com.Draughts2.stuart.draughts;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -22,17 +21,6 @@ public class MainMenu extends AppCompatActivity {
         player1Colour = 1;
         player2Colour = 0;
         difficulty = 1;
-    }
-
-    //Runs when "Start Game" button on home screen is pressed- starts game activity, passes settings to activity
-    public void startGame(View view) {
-        Intent intent = new Intent(MainMenu.this, GameActivity.class);
-        intent.putExtra("againstComputer", againstComputer);
-        intent.putExtra("optionalCapture", optionalCapture);
-        intent.putExtra("player1Colour", player1Colour);
-        intent.putExtra("player2Colour", player2Colour);
-        intent.putExtra("difficulty", difficulty);
-        startActivity(intent);
     }
 
     public void startSettings(View view){

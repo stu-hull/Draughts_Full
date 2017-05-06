@@ -1,4 +1,4 @@
-package com.example.stuart.draughts;
+package com.Draughts2.stuart.draughts;
 
 import android.os.Handler;
 import android.os.Message;
@@ -152,7 +152,7 @@ public class GameActivity extends AppCompatActivity {
         //set up player 1 label
         player1Label = new TextView(this);
         player1Label.setId(R.id.player1Label);
-        player1Label.setText(R.string.player1);
+        player1Label.setText(R.string.player_1);
         player1Label.setTextSize(50);
         player1Label.setTextColor(ContextCompat.getColor(this, R.color.yourTurn));
         RelativeLayout.LayoutParams player1LabelParams = new RelativeLayout.LayoutParams(
@@ -166,7 +166,7 @@ public class GameActivity extends AppCompatActivity {
         //set up player 2 label
         player2Label = new TextView(this);
         player2Label.setId(R.id.player2Label);
-        player2Label.setText(R.string.player2);
+        player2Label.setText(R.string.player_2);
         player2Label.setTextSize(30);
         player2Label.setTextColor(ContextCompat.getColor(this, R.color.notYourTurn));
         RelativeLayout.LayoutParams player2LabelParams = new RelativeLayout.LayoutParams(
@@ -179,7 +179,7 @@ public class GameActivity extends AppCompatActivity {
 
         //set up undo button
         undoButton = new Button(this);
-        undoButton.setText(R.string.undoButton);
+        undoButton.setText(R.string.undo_button);
         undoButton.setTextSize(20);
         undoButton.setOnClickListener(undoMove);
         RelativeLayout.LayoutParams undoButtonParams = new RelativeLayout.LayoutParams(
@@ -289,16 +289,16 @@ public class GameActivity extends AppCompatActivity {
                     //set up gameOverMessage depending on who won
                     gameOverMessage.setId(R.id.gameOverMessage);
                     if (game.isAgainstComputer() && game.isPlayer1Turn()) { //if player lost against computer
-                        gameOverMessage.setText(R.string.youLost);
+                        gameOverMessage.setText(R.string.you_lost);
                         gameOverMessage.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.loseColour));
                     } else {
                         gameOverMessage.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.winColour));
                         if (game.isAgainstComputer() && !(game.isPlayer1Turn())) { //if player 1 won against computer
-                            gameOverMessage.setText(R.string.youWon);
+                            gameOverMessage.setText(R.string.you_won);
                         } else if (game.isPlayer1Turn()) { //if player 2 won against human
-                            gameOverMessage.setText(R.string.player2Won);
+                            gameOverMessage.setText(R.string.player_2_won);
                         } else { //else player 1 won
-                            gameOverMessage.setText(R.string.player1Won);
+                            gameOverMessage.setText(R.string.player_1_won);
                         }
                     }
                     layout.addView(gameOverMessage);
@@ -554,9 +554,9 @@ public class GameActivity extends AppCompatActivity {
             case 3: return availableMoves[0]; //if in HAL mode, always return best move
             case 2:
                 if (optionalCapture){
-                    proportion = (float) 0.11; //proportion of best moves that will be considered
+                    proportion = (float) 0.13; //proportion of best moves that will be considered
                 } else {
-                    proportion = (float) 0.14;
+                    proportion = (float) 0.15;
                 }
                 break;
             case 1:
@@ -568,9 +568,9 @@ public class GameActivity extends AppCompatActivity {
                 break;
             case 0:
                 if (optionalCapture){
-                    proportion = (float) 0.3;
+                    proportion = (float) 0.35;
                 } else {
-                    proportion = (float) 0.6;
+                    proportion = (float) 0.7;
                 }
                 break;
             default:
@@ -581,28 +581,6 @@ public class GameActivity extends AppCompatActivity {
         Random r = new Random();
         int moveChosen = r.nextInt(movesConsidered);
         return availableMoves[moveChosen];
-
-        /*
-        //creates a spinner out of moveValues, based on powers
-        double total = 0;
-        for (int i=0; i<moveValues.length; i++){
-            moveValues[i] = Math.pow(base, -moveValues[i]);
-            total += moveValues[i];
-        }
-        System.out.println(Arrays.toString(moveValues));
-        Random r = new Random();
-        float result = (float) (r.nextFloat()*total); //spin the spinner
-        double runningTotal = 0;
-        for (int i=0; i<moveValues.length; i++){
-            runningTotal += moveValues[i];
-            if (result < runningTotal){
-                System.out.print("Move chosen: "); System.out.println(i);
-                return availableMoves[i];
-            }
-        }
-
-        return null;
-        */
     } //DONE //TESTED
 
     //does a simple selection sort, highest-first. Takes a key array and a data array, and sorts both based on the key values.
@@ -622,15 +600,6 @@ public class GameActivity extends AppCompatActivity {
         dataArray[i] = dataArray[j];
         keyArray[j] = holdKey;
         dataArray[j] = holdData;
-    }
-
-    //squishes a value between 1 and -1
-    private double squish (double value){
-        if (value > 0){
-            return value / (1 + value);
-        } else {
-            return value / (1 - value);
-        }
     }
 
     private void sendMessage(float progress){

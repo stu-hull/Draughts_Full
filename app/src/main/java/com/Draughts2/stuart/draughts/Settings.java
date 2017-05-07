@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -149,6 +150,22 @@ public class Settings extends AppCompatActivity {
 
         intent.putExtra("player1Colour", player1Spinner.getSelectedItemPosition());
         intent.putExtra("player2Colour", player2Spinner.getSelectedItemPosition());
+
+        RadioButton easy = (RadioButton) findViewById(R.id.difficultyEasy);
+        RadioButton hard = (RadioButton) findViewById(R.id.difficultyHard);
+        RadioButton hal = (RadioButton) findViewById(R.id.difficultyHAL);
+
+        int difficulty;
+        if (easy.isChecked()){
+            difficulty = 0;
+        } else if (hard.isChecked()){
+            difficulty = 2;
+        } else if (hal.isChecked()){
+            difficulty = 3;
+        } else {
+            difficulty = 1;
+        }
+        intent.putExtra("difficulty", difficulty);
 
         startActivity(intent);
     }

@@ -61,6 +61,23 @@ class Game{
         legalMoves = currentBoard.findMoves(true, optionalCapture);
     }
 
+    //creates a copy of a game from another game
+    Game(Game anotherGame){
+        this.againstComputer = anotherGame.isAgainstComputer();
+        this.optionalCapture = anotherGame.isOptionalCapture();
+        this.player1Turn = anotherGame.isPlayer1Turn();
+        this.currentBoard = new Board(anotherGame.getCurrentBoard());
+        this.legalMoves = new Board[anotherGame.getLegalMoves().length];
+        for (int i=0; i<legalMoves.length; i++){
+            this.legalMoves[i] = new Board(anotherGame.getLegalMoves()[i]);
+        }
+        if (anotherGame.getPreviousGameState() != null) {
+            this.previousGameState = new Game(anotherGame.getPreviousGameState());
+        } else {
+            this.previousGameState = null;
+        }
+    }
+
     //update currentBoard
     void setCurrentBoard(Board newBoard, int highlighted){
         if (inMultiJump){
@@ -75,14 +92,7 @@ class Game{
 
     //save current game state to undo to
     void saveGame(){
-        previousGameState = new Game(againstComputer, optionalCapture); //copy game into previousGameState
-        previousGameState.currentBoard.copyBoard(this.currentBoard); //copyBoard acts as a deepcopy for Board objects
-        previousGameState.legalMoves = new Board[this.legalMoves.length];
-        for (int i=0; i < this.legalMoves.length; i++){ //Iterate through legalMoves, copyBoarding each into previousGameState
-            previousGameState.legalMoves[i] = new Board();
-            previousGameState.legalMoves[i].copyBoard(this.legalMoves[i]);
-        }
-        previousGameState.player1Turn = this.player1Turn;
+        previousGameState = new Game(this);
     }
 
 }

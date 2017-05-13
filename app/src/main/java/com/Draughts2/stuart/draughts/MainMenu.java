@@ -28,23 +28,11 @@ public class MainMenu extends AppCompatActivity {
         startActivityForResult(intent, 1);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1){
-            if (resultCode == RESULT_OK){
-                againstComputer = data.getExtras().getBoolean("againstComputer");
-                optionalCapture = data.getExtras().getBoolean("optionalCapture");
-                if (data.getExtras().getBoolean("defaultColours", true)){
-                    player1Colour = 1;
-                    player2Colour = 0;
-                } else {
-                    player1Colour = data.getExtras().getInt("player1Colour", 1);
-                    player2Colour = data.getExtras().getInt("player2Colour", 0);
-                }
-                difficulty = data.getExtras().getInt("difficulty");
-            }
-        }
+    public void loadGame(View view){
+        Intent intent = new Intent(MainMenu.this, Settings.class);
+        intent.putExtra("loadGame", true);
+        System.out.println("PRESSED LOADGAME");
+        startActivityForResult(intent, 1);
     }
 
 }

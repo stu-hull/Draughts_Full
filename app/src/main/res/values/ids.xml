@@ -2,10 +2,10 @@
 <resources>
     <item name="computer_toggle" type="id"/>
 
-    <item name="gameBoard" type="id"/>
+    <item name="game_board" type="id"/>
 
-    <item name="player1Label" type="id"/>
-    <item name="player2Label" type="id"/>
+    <item name="player_1_label" type="id"/>
+    <item name="player_2_label" type="id"/>
 
     <item name="counter0" type="id"/>
     <item name="counter1" type="id"/>
@@ -31,8 +31,8 @@
     <item name="counter21" type="id"/>
     <item name="counter22" type="id"/>
     <item name="counter23" type="id"/>
+    <item name="counter24" type="id" />
 
-    <item name="gameOverMessage" type="id"/>
-
-    <item name="progressBar" type="id"/>
+    <item name="game_over_message" type="id"/>
+    <item name="progress_bar" type="id"/>
 </resources>

@@ -48,7 +48,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="15dp"
         android:text="@string/difficulty_label"
-        android:textSize="@dimen/difficultyLabelSize"
+        android:textSize="@dimen/difficulty_label_size"
         android:visibility="gone"/>
     <RadioGroup
         android:id="@+id/difficultyGroup"
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/player_1_colour_label"
-                android:textSize="@dimen/playerColourLabelSize"/>
+                android:textSize="@dimen/player_colour_label_size"/>
             <ImageView
                 android:layout_width="@dimen/sample_image_size"
                 android:layout_height="@dimen/sample_image_size"
@@ -126,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/player_2_colour_label"
-                android:textSize="@dimen/playerColourLabelSize" />
+                android:textSize="@dimen/player_colour_label_size" />
             <ImageView
                 android:layout_width="@dimen/sample_image_size"
                 android:layout_height="@dimen/sample_image_size"
@@ -151,7 +151,7 @@
         android:text="@string/colour_same_error_text"
         android:textSize="@dimen/colour_same_error_size"
         android:textAlignment="center"
-        android:textColor="@color/loseColour"
+        android:textColor="@color/lose_colour"
         android:visibility="invisible" />
 
     <RelativeLayout

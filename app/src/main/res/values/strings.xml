@@ -49,6 +49,7 @@
 
     <string name="settings">Settings</string>
     <string name="colour_same_error_text">Each player\'s counters must be a diferent colour</string>
+    <string name="load_game">Load Game</string>
 
 
 </resources>

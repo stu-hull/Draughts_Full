@@ -67,13 +67,18 @@ class Board {
         whitePieces = 0b0000000000000000000000000000000000000000000000L;
         kings =       0b0000000000000000000000000000000000000000000000L;
     } //sets up a board with no pieces on, the players return this as their best move if they cannot play
-    void copyBoard(Board original){
+    Board(long blackPieces, long whitePieces, long kings){
+        this.blackPieces = blackPieces;
+        this.whitePieces = whitePieces;
+        this.kings = kings;
+    } //sets up board using black, white and king values
+    Board(Board original){
         blackPieces = original.getBlackPieces();
         whitePieces = original.getWhitePieces();
         kings = original.getKings();
     } //sets up a board as a copy of another board
 
-    public boolean equals(Board board){
+    boolean equals(Board board){
         return (this.blackPieces == board.blackPieces) && (this.whitePieces == board.whitePieces) && (this.kings == board.kings);
     }
 
@@ -126,8 +131,7 @@ class Board {
     //moves one piece, either sliding or a single capture (NO multiple captures) (returns new board, leaves old board)
     Board makeSimpleMove(int source, int destination){
 
-        Board afterMove = new Board();
-        afterMove.copyBoard(this);
+        Board afterMove = new Board(this);
 
         //if gap between source and destination, remove piece in middle
         if ((source-destination)*(source-destination) > 25) {

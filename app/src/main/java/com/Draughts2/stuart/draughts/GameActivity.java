@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.*;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
@@ -134,7 +135,7 @@ public class GameActivity extends AppCompatActivity {
         boolean optionalCapture;
         boolean player1Turn = true;
 
-        preferences = this.getPreferences(Context.MODE_PRIVATE);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         //if getFromFile, get all data from file
         if (getFromFile){
             System.out.println("GETFROMFILE TRUE, GETTING SETTINGS FROM FILE");

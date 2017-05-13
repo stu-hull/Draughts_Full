@@ -9,7 +9,10 @@ package com.Draughts2.stuart.draughts;
 
 // 'currentBoard' refers ONLY to the current gamestate being displayed to the player. For all other hypothetical boards please use 'board'
 
-class Game{
+import android.os.Parcel;
+import android.os.Parcelable;
+
+class Game implements Parcelable{
 
     private Board currentBoard; //current board being displayed
     private Board[] legalMoves; //array of legal moves available
@@ -50,6 +53,18 @@ class Game{
         return previousGameState;
     }
 
+    public static final Creator<Game> CREATOR = new Creator<Game>() {
+        @Override
+        public Game createFromParcel(Parcel in) {
+            return new Game(in);
+        }
+
+        @Override
+        public Game[] newArray(int size) {
+            return new Game[size];
+        }
+    };
+
     //constructor sets up initial details of the game and displays them
     Game(boolean againstComputer, boolean optionalCapture) {
         this.againstComputer = againstComputer; //is the game against the computer? Which player is black?
@@ -78,6 +93,36 @@ class Game{
         }
     }
 
+    //creates game from a parcel
+    protected Game(Parcel in) {
+        //read data from arrays
+        boolean[] booleanData = new boolean[3];
+        in.readBooleanArray(booleanData);
+        long[] longData = new long[3];
+        in.readLongArray(longData);
+
+        //save data from arrays
+        inMultiJump = false;
+        againstComputer = booleanData[0];
+        optionalCapture = booleanData[1];
+        player1Turn = booleanData[2];
+        currentBoard = new Board(longData[0], longData[1], longData[2]);
+
+        //recalculate legal moves
+        legalMoves = currentBoard.findMoves(player1Turn, optionalCapture);
+
+    }
+
+    Game(Board board, boolean againstComputer, boolean optionalCapture, boolean player1Turn){
+        this.againstComputer = againstComputer; //is the game against the computer? Which player is black?
+        this.optionalCapture = optionalCapture;
+        this.player1Turn = player1Turn;
+
+        //create the board
+        currentBoard = board;
+        legalMoves = currentBoard.findMoves(player1Turn, optionalCapture);
+    }
+
     //update currentBoard
     void setCurrentBoard(Board newBoard, int highlighted){
         if (inMultiJump){
@@ -95,4 +140,14 @@ class Game{
         previousGameState = new Game(this);
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeBooleanArray(new boolean[]{againstComputer, optionalCapture, player1Turn});
+        out.writeLongArray(new long[]{currentBoard.getBlackPieces(), currentBoard.getWhitePieces(), currentBoard.getKings()});
+    }
 }

@@ -1,5 +1,7 @@
 package com.Draughts2.stuart.draughts;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.*;
@@ -21,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
@@ -53,6 +56,8 @@ public class GameActivity extends AppCompatActivity {
 
     Thread myThread;
 
+    int player1Colour;
+    int player2Colour;
     int player1ManID;
     int player1KingID;
     int player2ManID;
@@ -60,6 +65,9 @@ public class GameActivity extends AppCompatActivity {
 
     int highlighted = -1;
     Boolean inGame = true;
+
+    SharedPreferences preferences; //for saving data
+    SharedPreferences.Editor editor;
 
     //handler sends a toast message to the screen
     Handler handler = new Handler(){
@@ -93,6 +101,7 @@ public class GameActivity extends AppCompatActivity {
                 } else {
                     game = game.getPreviousGameState();
                 }
+                saveToFile();
                 highlighted = -1;
 
                 removeCounterViews();
@@ -118,6 +127,52 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        boolean getFromFile = getIntent().getBooleanExtra("getFromFile", false);
+
+        boolean againstComputer;
+        boolean optionalCapture;
+        boolean player1Turn = true;
+
+        preferences = this.getPreferences(Context.MODE_PRIVATE);
+        //if getFromFile, get all data from file
+        if (getFromFile){
+            System.out.println("GETFROMFILE TRUE, GETTING SETTINGS FROM FILE");
+            long blackPieces = preferences.getLong("blackPieces", 0);
+            long whitePieces = preferences.getLong("whitePieces", 0);
+            long kings = preferences.getLong("kings", 0);
+            Board board = new Board(blackPieces, whitePieces, kings);
+
+            againstComputer = preferences.getBoolean("againstComputer", false);
+            optionalCapture = preferences.getBoolean("optionalCapture", false);
+            player1Turn = preferences.getBoolean("player1Turn", true);
+
+            game = new Game(board, againstComputer, optionalCapture, player1Turn);
+            difficulty = preferences.getInt("difficulty", 1);
+
+            player1Colour = preferences.getInt("player1Colour", 1); //get player 1 colour code
+            player2Colour = preferences.getInt("player2Colour", 0); //get player 2 colour code
+
+        } else {
+            System.out.println("GETFROMFILE FALSE, GETTING SETTINGS FROM INTENT");
+            againstComputer = getIntent().getBooleanExtra("againstComputer", false);
+            optionalCapture = getIntent().getBooleanExtra("optionalCapture", false);
+
+            game = new Game(againstComputer, optionalCapture);
+            difficulty = getIntent().getIntExtra("difficulty", 1);
+
+            player1Colour = getIntent().getIntExtra("player1Colour", 1); //get player 1 colour code
+            player2Colour = getIntent().getIntExtra("player2Colour", 1); //get player 2 colour code
+        }
+
+        System.out.println(againstComputer);
+        System.out.println(optionalCapture);
+        System.out.println(player1Turn);
+        System.out.println(player1Colour);
+        System.out.println(player2Colour);
+        System.out.println(difficulty);
+
+
 
         //find dimensions dynamically
         DisplayMetrics metrics = getResources().getDisplayMetrics(); //metrics holds information about the display
@@ -158,8 +213,13 @@ public class GameActivity extends AppCompatActivity {
         player1Label = new TextView(this);
         player1Label.setId(R.id.player_1_label);
         player1Label.setText(R.string.player_1);
-        player1Label.setTextSize(50);
-        player1Label.setTextColor(ContextCompat.getColor(this, R.color.your_turn));
+        if (game.isPlayer1Turn()) {
+            player1Label.setTextSize(50);
+            player1Label.setTextColor(ContextCompat.getColor(this, R.color.your_turn));
+        } else {
+            player1Label.setTextSize(30);
+            player1Label.setTextColor(ContextCompat.getColor(this, R.color.not_your_turn));
+        }
         RelativeLayout.LayoutParams player1LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -172,8 +232,13 @@ public class GameActivity extends AppCompatActivity {
         player2Label = new TextView(this);
         player2Label.setId(R.id.player_2_label);
         player2Label.setText(R.string.player_2);
-        player2Label.setTextSize(30);
-        player2Label.setTextColor(ContextCompat.getColor(this, R.color.not_your_turn));
+        if (!game.isPlayer1Turn()) {
+            player2Label.setTextSize(50);
+            player2Label.setTextColor(ContextCompat.getColor(this, R.color.your_turn));
+        } else {
+            player2Label.setTextSize(30);
+            player2Label.setTextColor(ContextCompat.getColor(this, R.color.not_your_turn));
+        }
         RelativeLayout.LayoutParams player2LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -219,17 +284,12 @@ public class GameActivity extends AppCompatActivity {
         bar.setLayoutParams(barParams);
 
         //set up game with passed in extras
-        Boolean againstComputer = getIntent().getBooleanExtra("againstComputer", false);
-        Boolean optionalCapture = getIntent().getBooleanExtra("optionalCapture", false);
-        game = new Game(againstComputer, optionalCapture);
         if (againstComputer){
             hal = new Ai(optionalCapture);
-            difficulty = getIntent().getIntExtra("difficulty", 1);
             System.out.println(difficulty);
         }
 
         //set up counter images
-        int player1Colour = getIntent().getIntExtra("player1Colour", 1); //get player 1 colour code
         switch (player1Colour){
             case 0:
                 player1ManID = R.drawable.whiteman; //choose image based on colour code
@@ -248,7 +308,6 @@ public class GameActivity extends AppCompatActivity {
                 player1KingID = R.drawable.redking;
         }
 
-        int player2Colour = getIntent().getIntExtra("player2Colour", 0); //get player 1 colour code
         switch (player2Colour){
             case 0:
                 player2ManID = R.drawable.whiteman; //choose image based on colour code
@@ -282,10 +341,14 @@ public class GameActivity extends AppCompatActivity {
 
             } else if (game.isPlayer1Turn() || !game.isAgainstComputer()) { //else if it's a human's turn, the user needs to input
                 int bit = touchToBit((int) event.getX(), (int) event.getY()); //get bit value of square tapped on
+                boolean turnBeforeInput = game.isPlayer1Turn();
                 Board newBoard = userInput(bit); //pass on input to userInput to deal with
 
                 if (newBoard != null) { //if board returned, change currentBoard
                     game.setCurrentBoard(newBoard, highlighted);
+                    if (turnBeforeInput != game.isPlayer1Turn() && !game.isAgainstComputer()){ //if turn has changed and not against computer, save game
+                        saveToFile();
+                    }
                 }
 
                 removeCounterViews(); //clear views
@@ -333,6 +396,7 @@ public class GameActivity extends AppCompatActivity {
                             public void run() {
                                 game.setCurrentBoard(minimax(game.getCurrentBoard() , 9, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
                                 game.saveGame();
+                                saveToFile(); //after computer finished, save game
                             }
                         };
                         myThread = new Thread(runnable); //run thread
@@ -343,6 +407,29 @@ public class GameActivity extends AppCompatActivity {
         }
 
         return super.onTouchEvent(event);
+    }
+
+    private void saveToFile(){
+        System.out.println("SAVING TO FILE:");
+        editor = preferences.edit();
+        editor.putLong("blackPieces", game.getCurrentBoard().getBlackPieces());
+        editor.putLong("whitePieces", game.getCurrentBoard().getWhitePieces());
+        editor.putLong("kings", game.getCurrentBoard().getKings());
+
+        editor.putBoolean("againstComputer", game.isAgainstComputer());
+        editor.putBoolean("optionalCapture", game.isOptionalCapture());
+        editor.putBoolean("player1Turn", game.isPlayer1Turn());
+
+        editor.putInt("difficulty", difficulty);
+
+        editor.putInt("player1Colour", player1Colour);
+        editor.putInt("player2Colour", player2Colour);
+
+        System.out.println(!game.isPlayer1Turn());
+        System.out.println(player1Colour);
+        System.out.println(player2Colour);
+
+        editor.apply();
     }
 
     //takes touch coordinates and returns the closest square on the board, as a bitboard index
@@ -616,6 +703,23 @@ public class GameActivity extends AppCompatActivity {
         bundle.putFloat("progress", progress); //tell handler done
         msg.setData(bundle);
         handler.sendMessage(msg);
+    }
+
+    @Override
+    protected void onDestroy(){
+        System.out.println("DESTROYED");
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        System.out.println("COMMITTING TO FILE");
+        try {
+            editor.commit();
+        } catch (NullPointerException e){
+            System.out.println("COMMIT FAILED");
+        }
     }
 
 }

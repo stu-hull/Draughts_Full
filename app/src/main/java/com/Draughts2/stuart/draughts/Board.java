@@ -67,6 +67,11 @@ class Board {
         whitePieces = 0b0000000000000000000000000000000000000000000000L;
         kings =       0b0000000000000000000000000000000000000000000000L;
     } //sets up a board with no pieces on, the players return this as their best move if they cannot play
+    Board(long blackPieces, long whitePieces, long kings){
+        this.blackPieces = blackPieces;
+        this.whitePieces = whitePieces;
+        this.kings = kings;
+    } //sets up board using black, white and king values
     Board(Board original){
         blackPieces = original.getBlackPieces();
         whitePieces = original.getWhitePieces();

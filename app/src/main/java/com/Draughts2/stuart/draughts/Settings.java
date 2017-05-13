@@ -121,6 +121,22 @@ public class Settings extends AppCompatActivity {
         warningMessage = (TextView) findViewById(R.id.colour_same_error);
         startGame = (Button) findViewById(R.id.new_game);
         goodToGo = true;
+
+        System.out.println("SETTINGS ONCREATE RUNNING");
+        boolean loadGame = getIntent().getBooleanExtra("loadGame", false);
+        if (loadGame){
+            System.out.println("LOADGAME TRUE, STARTING GAME IMMEDIATELY");
+            Intent intent = new Intent(Settings.this, GameActivity.class);
+            intent.putExtra("getFromFile", true);
+            startActivity(intent);
+        } else {
+            System.out.println("LOADGAME FALSE");
+        }
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
     }
 
     //checks if player has chosen 2 same colours

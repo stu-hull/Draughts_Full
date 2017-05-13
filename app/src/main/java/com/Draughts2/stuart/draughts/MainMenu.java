@@ -28,4 +28,11 @@ public class MainMenu extends AppCompatActivity {
         startActivityForResult(intent, 1);
     }
 
+    public void loadGame(View view){
+        Intent intent = new Intent(MainMenu.this, Settings.class);
+        intent.putExtra("loadGame", true);
+        System.out.println("PRESSED LOADGAME");
+        startActivityForResult(intent, 1);
+    }
+
 }

@@ -10,20 +10,10 @@ import android.widget.Button;
 
 public class MainMenu extends AppCompatActivity {
 
-    Boolean againstComputer;
-    Boolean optionalCapture;
-    int player1Colour;
-    int player2Colour;
-    int difficulty;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-        againstComputer = false;
-        player1Colour = 1;
-        player2Colour = 0;
-        difficulty = 1;
     }
 
     @Override

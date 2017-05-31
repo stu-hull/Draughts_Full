@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_settings"
@@ -14,139 +15,161 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:text="@string/settings_text"
         android:textSize="@dimen/settings_text_size"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:layout_marginBottom="@dimen/standard_margin"/>
 
-    <Switch
-        android:text="@string/optional_capture_toggle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textOn="@string/optional_on"
-        android:textOff="@string/optional_off"
-        android:layout_marginTop="@dimen/large_margin"
-        android:switchPadding="10dp"
-        android:id="@+id/compulsoryToggle"/>
-
-    <Switch
-        android:text="@string/computer_toggle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textOn="@string/computer_on"
-        android:textOff="@string/computer_off"
-        android:layout_marginTop="5dp"
-        android:switchPadding="10dp"
-        android:id="@+id/computer_toggle"/>
-
-    <TextView
-        android:id="@+id/difficultyLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp"
-        android:text="@string/difficulty_label"
-        android:textSize="@dimen/difficulty_label_size"
-        android:visibility="gone"/>
-    <RadioGroup
-        android:id="@+id/difficultyGroup"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone">
-        <RadioButton
-            android:text="@string/difficulty_easy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/difficultyEasy"/>
-        <RadioButton
-            android:text="@string/difficulty_medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/difficultyMedium"
-            android:checked="true"/>
-        <RadioButton
-            android:text="@string/difficulty_hard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/difficultyHard"/>
-        <RadioButton
-            android:text="@string/difficulty_HAL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/difficultyHAL"/>
-    </RadioGroup>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:baselineAligned="false"
-        android:layout_marginTop="@dimen/standard_margin">
+        android:layout_height="0dp"
+        android:layout_weight="5">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:background="@color/background">
+
+            <Switch
+                android:text="@string/optional_capture_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textOn="@string/optional_on"
+                android:textOff="@string/optional_off"
+                android:switchPadding="10dp"
+                android:id="@+id/compulsoryToggle"/>
+
+            <Switch
+                android:text="@string/computer_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textOn="@string/computer_on"
+                android:textOff="@string/computer_off"
+                android:layout_marginTop="5dp"
+                android:switchPadding="10dp"
+                android:id="@+id/computer_toggle"/>
+
             <TextView
+                android:id="@+id/difficultyLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/player_1_colour_label"
-                android:textSize="@dimen/player_colour_label_size"/>
-            <ImageView
-                android:layout_width="@dimen/sample_image_size"
-                android:layout_height="@dimen/sample_image_size"
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/player_1_counter_image"
-                android:src="@drawable/redman" />
-            <Spinner
-                android:id="@+id/player1ColourSpinner"
-                android:layout_width="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/difficulty_label"
+                android:textSize="@dimen/difficulty_label_size"
+                android:visibility="gone"/>
+            <RadioGroup
+                android:id="@+id/difficultyGroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/small_margin"
-                android:layout_gravity="center_horizontal">
-            </Spinner>
+                android:visibility="gone">
+                <RadioButton
+                    android:text="@string/difficulty_easy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/difficultyEasy"/>
+                <RadioButton
+                    android:text="@string/difficulty_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/difficultyMedium"
+                    android:checked="true"/>
+                <RadioButton
+                    android:text="@string/difficulty_hard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/difficultyHard"/>
+                <RadioButton
+                    android:text="@string/difficulty_HAL"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/difficultyHAL"/>
+            </RadioGroup>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:layout_marginTop="@dimen/standard_margin">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="@string/player_1_colour_label"
+                        android:textSize="@dimen/player_colour_label_size"/>
+                    <ImageView
+                        android:layout_width="@dimen/sample_image_size"
+                        android:layout_height="@dimen/sample_image_size"
+                        android:layout_gravity="center_horizontal"
+                        android:id="@+id/player_1_counter_image"
+                        android:src="@drawable/redman" />
+                    <Spinner
+                        android:id="@+id/player1ColourSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/small_margin"
+                        android:layout_gravity="center_horizontal">
+                    </Spinner>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="@string/player_2_colour_label"
+                        android:textSize="@dimen/player_colour_label_size" />
+                    <ImageView
+                        android:layout_width="@dimen/sample_image_size"
+                        android:layout_height="@dimen/sample_image_size"
+                        android:layout_gravity="center_horizontal"
+                        android:id="@+id/player_2_counter_image"
+                        android:src="@drawable/whiteman" />
+                    <Spinner
+                        android:id="@+id/player2ColourSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/small_margin"
+                        android:layout_gravity="center_horizontal">
+                    </Spinner>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/player_2_colour_label"
-                android:textSize="@dimen/player_colour_label_size" />
-            <ImageView
-                android:layout_width="@dimen/sample_image_size"
-                android:layout_height="@dimen/sample_image_size"
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/player_2_counter_image"
-                android:src="@drawable/whiteman" />
-            <Spinner
-                android:id="@+id/player2ColourSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/small_margin"
-                android:layout_gravity="center_horizontal">
-            </Spinner>
-        </LinearLayout>
+    </ScrollView>
 
-    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginTop="@dimen/standard_margin"
         android:id="@+id/colour_same_error"
         android:text="@string/colour_same_error_text"
         android:textSize="@dimen/colour_same_error_size"
@@ -156,7 +179,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="60dp"
+        android:layout_marginBottom="@dimen/small_margin">
 
         <Button
             android:id="@+id/new_game"
@@ -164,8 +188,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:onClick="startGame"
-            android:text="@string/start_game"
-            android:layout_marginTop="@dimen/small_margin"/>
+            android:text="@string/start_game"/>
 
     </RelativeLayout>
 

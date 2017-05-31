@@ -18,10 +18,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.sql.Time;
-
 public class Settings extends AppCompatActivity {
 
     TextView difficultyLabel;

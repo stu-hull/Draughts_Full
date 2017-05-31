@@ -7,8 +7,8 @@ android {
         applicationId "com.Draughts2.stuart.draughts"
         minSdkVersion 15
         targetSdkVersion 25
-        versionName '1.1a'
-        versionCode 3
+        versionName '1.2'
+        versionCode 4
     }
     buildTypes {
         release {

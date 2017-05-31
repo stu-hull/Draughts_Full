@@ -74,13 +74,11 @@ public class GameActivity extends AppCompatActivity {
             }
             bar.setProgress(progress);
             if (progress >= 99){
+                System.out.println("Handler displaying AI's move");
                 ((ViewGroup) bar.getParent()).removeView(bar);
                 removeCounterViews();
                 addCounterViews(); //add in counters
-                player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.your_turn));
-                player1Label.setTextSize(50);
-                player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.not_your_turn));
-                player2Label.setTextSize(30);
+                changeLabels(true);
             }
             setContentView(layout);
         }
@@ -101,17 +99,7 @@ public class GameActivity extends AppCompatActivity {
 
                 removeCounterViews();
                 addCounterViews();
-                if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
-                    player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.your_turn));
-                    player1Label.setTextSize(50);
-                    player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.not_your_turn));
-                    player2Label.setTextSize(30);
-                } else {
-                    player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.your_turn));
-                    player2Label.setTextSize(50);
-                    player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.not_your_turn));
-                    player1Label.setTextSize(30);
-                }
+                changeLabels(game.isPlayer1Turn());
                 setContentView(layout);
             }
         }
@@ -208,13 +196,6 @@ public class GameActivity extends AppCompatActivity {
         player1Label = new TextView(this);
         player1Label.setId(R.id.player_1_label);
         player1Label.setText(R.string.player_1);
-        if (game.isPlayer1Turn()) {
-            player1Label.setTextSize(50);
-            player1Label.setTextColor(ContextCompat.getColor(this, R.color.your_turn));
-        } else {
-            player1Label.setTextSize(30);
-            player1Label.setTextColor(ContextCompat.getColor(this, R.color.not_your_turn));
-        }
         RelativeLayout.LayoutParams player1LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -227,13 +208,6 @@ public class GameActivity extends AppCompatActivity {
         player2Label = new TextView(this);
         player2Label.setId(R.id.player_2_label);
         player2Label.setText(R.string.player_2);
-        if (!game.isPlayer1Turn()) {
-            player2Label.setTextSize(50);
-            player2Label.setTextColor(ContextCompat.getColor(this, R.color.your_turn));
-        } else {
-            player2Label.setTextSize(30);
-            player2Label.setTextColor(ContextCompat.getColor(this, R.color.not_your_turn));
-        }
         RelativeLayout.LayoutParams player2LabelParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -241,6 +215,8 @@ public class GameActivity extends AppCompatActivity {
         player2LabelParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         player2Label.setLayoutParams(player2LabelParams);
         layout.addView(player2Label);
+
+        changeLabels(game.isPlayer1Turn()); //set label sizes
 
         //set up undo button
         undoButton = new Button(this);
@@ -372,17 +348,7 @@ public class GameActivity extends AppCompatActivity {
                 } else { //else game still in play
 
                     addCounterViews(); //add in counters
-                    if (game.isPlayer1Turn()) { //set message of turnLabel and move it from top to bottom of screen
-                        player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.your_turn));
-                        player1Label.setTextSize(50);
-                        player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.not_your_turn));
-                        player2Label.setTextSize(30);
-                    } else {
-                        player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.your_turn));
-                        player2Label.setTextSize(50);
-                        player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.not_your_turn));
-                        player1Label.setTextSize(30);
-                    }
+                    changeLabels(game.isPlayer1Turn()); //change player labels
                     setContentView(layout);
 
                     //if computer's turn, run AI in new thread
@@ -390,6 +356,7 @@ public class GameActivity extends AppCompatActivity {
                         Runnable runnable = new Runnable() { //setup new thread
                             public void run() {
                                 game.setCurrentBoard(minimax(game.getCurrentBoard() , 9, game.isOptionalCapture()), highlighted); //run minimax algorithm in new thread
+                                sendMessage(100);
                                 game.saveGame();
                                 saveToFile(); //after computer finished, save game
                             }
@@ -636,7 +603,6 @@ public class GameActivity extends AppCompatActivity {
         //sort the moves in order of value
         selectionSort(moveValues, availableMoves);
         System.out.println(Arrays.toString(moveValues));
-        sendMessage(100);
 
         //difficulty adjustment
         float proportion;
@@ -690,6 +656,21 @@ public class GameActivity extends AppCompatActivity {
         dataArray[i] = dataArray[j];
         keyArray[j] = holdKey;
         dataArray[j] = holdData;
+    }
+
+    //void method to change the player label views using a passed in boolean
+    private void changeLabels(boolean player1Turn){
+        if (player1Turn) { //set message of turnLabel and move it from top to bottom of screen
+            player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.your_turn));
+            player1Label.setTextSize(50);
+            player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.not_your_turn));
+            player2Label.setTextSize(30);
+        } else {
+            player2Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.your_turn));
+            player2Label.setTextSize(50);
+            player1Label.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.not_your_turn));
+            player1Label.setTextSize(30);
+        }
     }
 
     private void sendMessage(float progress){
